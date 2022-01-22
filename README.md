@@ -42,7 +42,7 @@ Bild | JSON-Param       | Funktion                | Datentyp  | Bemerkung  |
 ## Known Bugs / Verbesserungen
 - Sporadisch kurzer Verbindungsverlust, siehe Websocket vs PollingXHR
 - Manchmal werden mehrere "Instanzen" erstellt -> Lifecycle checken
-
+- ! Wenn Server URL definiert ist und nicht erreichbar bleibt die App  Startbildschirm
 - "Swipe" zu schließen aktivieren wenn kein Slider konfiguriert ist
 
 In der aktellen Version sollte die App auch mit den bekannten Bugs zuverlässig laufen
