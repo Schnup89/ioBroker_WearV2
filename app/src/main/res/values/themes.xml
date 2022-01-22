@@ -1,0 +1,45 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- No Swipe to exit app because of sliders -->
+    <style name="AppTheme" parent="@android:style/Theme.DeviceDefault">
+        <item name="android:windowSwipeToDismiss">false</item>
+    </style>
+
+    <!-- Base application theme. -->
+    <style name="Theme.IoBrokerW" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:windowSwipeToDismiss">false</item>
+
+    </style>
+    <color name="ioBackgound">#1f1f1f</color>
+    <style name="Theme.MySplash" parent="Theme.SplashScreen">
+
+        <item name="android:windowSwipeToDismiss">false</item>
+        <item name="windowSplashScreenBackground">@color/ioBackgound</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@drawable/iobroker_logo</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.IoBrokerW</item>
+    </style>
+
+    <style name="Theme.IoBrokerW.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowSwipeToDismiss">false</item>
+    </style>
+
+    <style name="Theme.IoBrokerW.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.IoBrokerW.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+</resources>
