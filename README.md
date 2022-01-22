@@ -34,7 +34,8 @@ Bild | JSON-Param       | Funktion                | Datentyp  | Bemerkung  |
 ![image](https://user-images.githubusercontent.com/28166743/150635717-40ae2677-9da2-4fe0-8f90-2699425a278c.png)
 
 
-
+## Konfiguration APP
+Server URL definieren im Format: http://192.168.10.4:8084
 
 
 
