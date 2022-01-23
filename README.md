@@ -1,5 +1,5 @@
 # ioBroker_WearV2
-WearApplication mit SocketIO und JetpackCompose
+WearOS Application mit SocketIO und JetpackCompose
 
 
 ## Konfiguration ioBroker
@@ -34,9 +34,17 @@ Bild | JSON-Param       | Funktion                | Datentyp  | Bemerkung  |
 ![image](https://user-images.githubusercontent.com/28166743/150635717-40ae2677-9da2-4fe0-8f90-2699425a278c.png)
 
 
+## APK installieren
+https://youtu.be/8HsfWPTFGQI
+
+
 ## Konfiguration APP
 Server URL definieren im Format: http://192.168.10.4:8084
 
+
+## Schnelltaste
+Damit die APP schnell geöffnet werden kann, habe ich diese auf die "Doppelklick"-Tastenfunktion der Uhr-Taste gelegt.  
+Zu finden hier: Einstellungen - Erweiterte Funktionen - Anpassen von Tasten > Hier kann die App verlinkt werden
 
 
 
@@ -49,7 +57,27 @@ Server URL definieren im Format: http://192.168.10.4:8084
 In der aktellen Version sollte die App auch mit den bekannten Bugs zuverlässig laufen
 
 
+## Jetpack Compose...
+...ist das neuste Toolkit zur Android APP-Entwicklung:  
+https://developer.android.com/jetpack/compose
+
+Leider ist dieses noch relativ "neu" und es mussten im Code einige (vermultiche) Bugs brücksichtigt bzw. Workarounds implementiert werden.  
+Bzgl. der Performance hoffe ich hier auf einige Updates in der Zukunft.  
+
+
 ## PollingXHR vs Websocket
-tdb  
+https://github.com/Schnup89/ioBroker_WearV2/blob/265252d2d10f3a0d4c854a4bccde8b2aa92a5e3d/app/src/main/java/com/schnup/iobrokerw/SocketHandler.kt
+-> Siehe "mOpts.transports ="  
+"PollingXHR" 
++ Sobald die SocketIO Verbindung zum ioBroker unterbrochen ist, wird innerhalb von Sekunden ein rotes "X" angezeigt.
+- Leider unterbricht (bei mir) die Verbindung manchmal für einen kurzen Moment (sichtbar am roten "X")
+  
+"Websocket"  
++ Stabile Verbindung ohne kurze abbrüche
+- (Bei mir) erkennung eines Verbindungsverlust erst nach 1,5 Minuten
+
+Da mit der Live-Status der Verbindung wichtig ist, und die kurzen Disconnects keine Fehler produzieren, habe ich Standardmäig diesen im Einsatz.
+
+
 
 
