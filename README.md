@@ -43,7 +43,7 @@ Server URL definieren im Format: http://192.168.10.4:8084
 ## Known Bugs / Verbesserungen
 - Sporadisch kurzer Verbindungsverlust, siehe Websocket vs PollingXHR
 - Manchmal werden mehrere "Instanzen" erstellt -> Lifecycle checken
-- ! Wenn Server URL definiert ist und nicht erreichbar bleibt die App  Startbildschirm
+- <s>Wenn Server URL definiert ist und nicht erreichbar bleibt die App  Startbildschirm</s>  - Fixed V2.1
 - "Swipe" zu schließen aktivieren wenn kein Slider konfiguriert ist
 
 In der aktellen Version sollte die App auch mit den bekannten Bugs zuverlässig laufen
