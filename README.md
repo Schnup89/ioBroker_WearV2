@@ -34,6 +34,14 @@ Bild | JSON-Param       | Funktion                | Datentyp  | Bemerkung  |
 ![image](https://user-images.githubusercontent.com/28166743/150635717-40ae2677-9da2-4fe0-8f90-2699425a278c.png)
 
 
+## Anordnung der Objekte
+Leider ist es aktuell in ioBroker nicht möglich Objekte in Räumen per "Drag&Drop" zu sortieren.  
+Die Objekte in den Räume können hier in der Reihenfolge geändert werden:  
+Objekt-Baum mit Expertenansicht öffnen und mit dem Schraubenschlüssel bei "enum.rooms.WearOS" in der JSON die Reihenfolge von "memers" bearbeiten.  
+! Bei einer Zuordnung von Object über den Objekt-Baum wird die Reihenfolge zurückgesetzt!
+! Räume am Ende anfügen geht über "Aufzählungen-Rooms-WearOS" per Drag&Drop
+
+
 ## APK installieren
 https://youtu.be/8HsfWPTFGQI
 
