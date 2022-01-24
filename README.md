@@ -1,5 +1,8 @@
 # ioBroker_WearV2
 WearOS Application mit SocketIO und JetpackCompose
+  
+Video:
+https://www.youtube.com/watch?v=gGTmlj9mHgY
 
 
 ## Konfiguration ioBroker
