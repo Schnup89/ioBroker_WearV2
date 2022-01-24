@@ -66,7 +66,7 @@ Zu finden hier: Einstellungen - Erweiterte Funktionen - Anpassen von Tasten > Hi
 
 ## Known Bugs / Verbesserungen
 - Sporadisch kurzer Verbindungsverlust, siehe Websocket vs PollingXHR
-- Manchmal werden mehrere "Instanzen" erstellt -> Lifecycle checken
+- ! Prio: Manchmal werden mehrere "Instanzen" erstellt -> Lifecycle checken
 - <s>Wenn Server URL definiert ist und nicht erreichbar bleibt die App  Startbildschirm</s>  - Fixed V2.1
 - "Swipe" zu schließen aktivieren wenn kein Slider konfiguriert ist
 
