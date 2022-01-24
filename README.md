@@ -56,6 +56,13 @@ Objekt-Baum mit Expertenansicht öffnen und mit dem Schraubenschlüssel bei "enu
 ! Räume am Ende anfügen geht über "Aufzählungen-Rooms-WearOS" per Drag&Drop
 ! Sobald die Räume geändert wurden, muss die App neu gestartet werden. Dazu reicht es den "Back"-Knopf an der Uhr zu drücken und die App neu zu öffnen.
 
+
+## RED X
+Sollte ein Fehler auftren wird fast immer ein rotes X irgendwo auftreten.  
+- Sollte ein roten X anstatt ein ICON dargestellt werden, kann das ICON nicht ausgelesen werden -> Bitte Issue eröffnen mit Objekt-JSON aus ioBroker
+- Im Status-Indicator: Grüner Haken -> SocketIO ist verbunden mit ioBroker; Rotes X -> SocketIO hat die Verbindung zu ioBroker verloren
+
+
 ## APK installieren
 https://youtu.be/8HsfWPTFGQI
 
