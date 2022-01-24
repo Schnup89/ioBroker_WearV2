@@ -48,7 +48,7 @@ Die Objekte in den Räume können hier in der Reihenfolge geändert werden:
 Objekt-Baum mit Expertenansicht öffnen und mit dem Schraubenschlüssel bei "enum.rooms.WearOS" in der JSON die Reihenfolge von "memers" bearbeiten.  
 ! Bei einer Zuordnung von Object über den Objekt-Baum wird die Reihenfolge zurückgesetzt!
 ! Räume am Ende anfügen geht über "Aufzählungen-Rooms-WearOS" per Drag&Drop
-
+! Sobald die Räume geändert wurden, muss die App neu gestartet werden. Dazu reicht es den "Back"-Knopf an der Uhr zu drücken und die App neu zu öffnen.
 
 ## APK installieren
 https://youtu.be/8HsfWPTFGQI
@@ -66,10 +66,10 @@ Zu finden hier: Einstellungen - Erweiterte Funktionen - Anpassen von Tasten > Hi
 
 ## Known Bugs / Verbesserungen
 - Sporadisch kurzer Verbindungsverlust, siehe Websocket vs PollingXHR
-- ! Prio: Manchmal werden mehrere "Instanzen" erstellt -> Lifecycle checken
+- <s>Manchmal werden mehrere "Instanzen" erstellt </s>
 - <s>Wenn Server URL definiert ist und nicht erreichbar bleibt die App  Startbildschirm</s>  - Fixed V2.1
 - "Swipe" zu schließen aktivieren wenn kein Slider konfiguriert ist
-- Rückgabewert anhand des definierten Typ Boolean/"ON","OFF"
+- <s>Rückgabewert anhand des definierten Typ Boolean/"ON","OFF"</s> <-ToggleChip ist jetzt immer boolean
 
 In der aktellen Version sollte die App auch mit den bekannten Bugs zuverlässig laufen
 
@@ -95,6 +95,21 @@ https://github.com/Schnup89/ioBroker_WearV2/blob/265252d2d10f3a0d4c854a4bccde8b2
 
 Da mit der Live-Status der Verbindung wichtig ist, und die kurzen Disconnects keine Fehler produzieren, habe ich Standardmäig diesen im Einsatz.
 
+
+## Changelog
+
+
+
+### 2.2 (2022-01-24)
+* (schnup89) BUGFIX: App kann nicht mehr parallel ausgeführt werden, nur noch eine Instanz zugelassen
+* (schnup89) BUGFIX: ToggleChip schreibt nun boolean anstatt string in ioBroker
+
+### 2.1 (2022-01-23)
+* (schnup89) BUGFIX: V2 konnte nicht installiert werden -> Sollte behoben sein
+* (schnup89) BUGFIX: Wenn Server URL definiert ist und nicht erreichbar bleibt die App Startbildschirm
+
+### 2.0 (2022-01-22)
+* (schnup89) Initial Release
 
 
 
