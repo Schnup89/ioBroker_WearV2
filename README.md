@@ -103,6 +103,7 @@ Da mit der Live-Status der Verbindung wichtig ist, und die kurzen Disconnects ke
 ### 2.2 (2022-01-24)
 * (schnup89) BUGFIX: App kann nicht mehr parallel ausgeführt werden, nur noch eine Instanz zugelassen
 * (schnup89) BUGFIX: ToggleChip schreibt nun boolean anstatt string in ioBroker
+* (schnup89) BUGFIX: Slider-Fixed bei -1 oder "out-of-range"
 
 ### 2.1 (2022-01-23)
 * (schnup89) BUGFIX: V2 konnte nicht installiert werden -> Sollte behoben sein
