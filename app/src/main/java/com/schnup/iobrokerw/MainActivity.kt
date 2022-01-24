@@ -50,6 +50,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.wear.input.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.system.exitProcess
 
 
 @Stable
@@ -62,7 +63,7 @@ data class dcIOChips(
     var sIconB64: String = "null",
     var bWriteable: Boolean = false,
     var sColorOn: String = "null",
-    var nMinMax: ClosedFloatingPointRange<Float> = 0.toFloat().rangeTo(20.toFloat()),
+    var nMinMax: ClosedFloatingPointRange<Float> = (0f).rangeTo(100f),
     var nType: Int = 0,                     //0 = Chip, 1 = ToggleChip, 2 = Slider  Unknown = Chip
     var bUpdateCompose: Boolean = false     //Used for Change value to trigger Compose Update
 )
@@ -217,7 +218,8 @@ class MainActivity : ComponentActivity() {
                                             enabled = myChip.bWriteable,
                                             onCheckedChange = {
                                                 hHaptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                mSocket.emit("setState", myChip.sStateID, (!myChip.sVal.toBoolean()).toString())
+                                                //mSocket.emit("setState", myChip.sStateID, (!myChip.sVal.toBoolean()).toString())
+                                                mSocket.emit("setState", myChip.sStateID, (!myChip.sVal.toBoolean()))
                                                 Thread.sleep(200)  //Prevent Multiclick <- Compose Bug?
                                             }
                                         )
@@ -293,9 +295,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
-                                            onClick = {
-                                                sNotify.value = myChip.sVal
-                                            },
+                                            onClick = {},
                                             enabled = myChip.bWriteable,
                                             colors = ChipDefaults.primaryChipColors(
                                                 backgroundColor = Color(32, 33, 36, 255)
@@ -434,6 +434,7 @@ class MainActivity : ComponentActivity() {
         }
         mSocket.on(Socket.EVENT_CONNECT_ERROR) {
             sIndicator.value = "X"
+            bIsLoading.value = false //If App is started and could not connect to server
             //***LOG
         }
         //Handle State Changes
@@ -525,8 +526,8 @@ class MainActivity : ComponentActivity() {
 
 
     fun fGetSliderRange(sMin:String,sMax:String): ClosedFloatingPointRange<Float> {
-        var nMin: Float = -1f
-        var nMax: Float = -1f
+        var nMin: Float = 0f
+        var nMax: Float = 100f
         sMin.toFloatOrNull().let {
             if (it != null) {
                 nMin = it
@@ -540,7 +541,7 @@ class MainActivity : ComponentActivity() {
         try {
             return nMin.rangeTo(nMax)
         }catch (e:java.lang.Exception){}
-        return (-1f).rangeTo(-1f)
+        return nMin.rangeTo(nMax)
     }
 
     suspend fun fSliderChanged(sStateID: String, nVal: Int, nIndex: Int) {
@@ -568,11 +569,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /*override fun onDestroy() {
-        super.onDestroy()
-        //Compose wont update or is laggy after stop&resume, 4 example if display goes to sleep and resume
-        //Workaround... Close that shit
-        SocketHandler.closeConnection()
-    }*/
-}
 
+    override fun onDestroy() {
+        super.onDestroy()
+        //We dont want the app to run in background
+        SocketHandler.closeConnection()
+    }
+}
