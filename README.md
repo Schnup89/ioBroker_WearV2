@@ -4,6 +4,9 @@ WearOS Application mit SocketIO und JetpackCompose
 Video:
 https://www.youtube.com/watch?v=gGTmlj9mHgY
 
+Icons:
+https://github.com/ioBroker/ioBroker.icons-ultimate-png
+
 
 ## Konfiguration ioBroker
 Der [SocketIO-Adapter](https://github.com/ioBroker/ioBroker.socketio) muss installiert sein.
