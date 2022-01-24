@@ -69,6 +69,7 @@ Zu finden hier: Einstellungen - Erweiterte Funktionen - Anpassen von Tasten > Hi
 - ! Prio: Manchmal werden mehrere "Instanzen" erstellt -> Lifecycle checken
 - <s>Wenn Server URL definiert ist und nicht erreichbar bleibt die App  Startbildschirm</s>  - Fixed V2.1
 - "Swipe" zu schließen aktivieren wenn kein Slider konfiguriert ist
+- Rückgabewert anhand des definierten Typ Boolean/"ON","OFF"
 
 In der aktellen Version sollte die App auch mit den bekannten Bugs zuverlässig laufen
 
