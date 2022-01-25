@@ -111,7 +111,8 @@ Da mit der Live-Status der Verbindung wichtig ist, und die kurzen Disconnects ke
 
 ## Changelog
 
-
+### 2.3 (2022-01-25)
+* (schnup89) BUGFIX: Color-Code Error Handling implementiert
 
 ### 2.2 (2022-01-24)
 * (schnup89) BUGFIX: App kann nicht mehr parallel ausgeführt werden, nur noch eine Instanz zugelassen
