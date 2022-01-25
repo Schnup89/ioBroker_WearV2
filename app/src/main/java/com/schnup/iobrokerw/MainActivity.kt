@@ -396,7 +396,6 @@ class MainActivity : ComponentActivity() {
         }
         //Check if configuration is present
         sUrl.value = this.getPreferences(Context.MODE_PRIVATE).getString("sUrl","").toString()
-        sUrl.value = "http://192.168.10.4:8084"
         if (sUrl.value.isEmpty()) {
             sNotify.value = "Bitte Server und Port angeben! \r\n Swipe nach rechts zum beenden ist deaktiviert!"
             bIsLoading.value = false
