@@ -50,6 +50,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.wear.input.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.IllegalArgumentException
 import kotlin.system.exitProcess
 
 
@@ -189,15 +190,12 @@ class MainActivity : ComponentActivity() {
                                                 var cStateON: Color = Color.Unspecified
                                                 //Check if Icon present
                                                 if (!(myChip.sIconB64.isEmpty()) and (myChip.sIconB64 != "null")) {
-                                                    //Check if ON-Color is provided
-                                                    if ((myChip.sVal.toBoolean()) and (!myChip.sColorOn.isEmpty()))
-                                                        try {
-                                                            cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
-                                                        }catch (e: java.lang.Exception) {}
+                                                    //Check if ON-Color is provided and value is ON
+                                                    if (myChip.sVal.toBoolean()) cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
                                                 Icon(
                                                         bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
                                                         contentDescription = "Custom",
-                                                        tint = cStateON ,
+                                                        tint = cStateON,
                                                         modifier = Modifier
                                                             .padding(top = 3.dp, bottom = 3.dp)
                                                             .wrapContentSize(align = Alignment.Center),
@@ -265,7 +263,8 @@ class MainActivity : ComponentActivity() {
                                                         },
                                                         enabled = myChip.bWriteable,
                                                         valueRange = myChip.nMinMax,
-                                                        colors = SliderDefaults.colors(
+                                                        colors =
+                                                        SliderDefaults.colors(
                                                             activeTickColor = Color(
                                                                 android.graphics.Color.parseColor(
                                                                     myChip.sColorOn
@@ -397,6 +396,7 @@ class MainActivity : ComponentActivity() {
         }
         //Check if configuration is present
         sUrl.value = this.getPreferences(Context.MODE_PRIVATE).getString("sUrl","").toString()
+        sUrl.value = "http://192.168.10.4:8084"
         if (sUrl.value.isEmpty()) {
             sNotify.value = "Bitte Server und Port angeben! \r\n Swipe nach rechts zum beenden ist deaktiviert!"
             bIsLoading.value = false
@@ -495,7 +495,7 @@ class MainActivity : ComponentActivity() {
             newChip.sUnit = jsEnums["common"]!!.jsonObject["unit"].toString().replace("\"","")
             newChip.sIconB64 = jsEnums["common"]!!.jsonObject["icon"].toString().replace("\"","")
             newChip.bWriteable  = jsEnums["common"]!!.jsonObject["write"].toString().replace("\"","").toBoolean()
-            newChip.sColorOn = jsEnums["common"]!!.jsonObject["color"].toString().replace("\"","")
+            newChip.sColorOn = fCheckColorCode(jsEnums["common"]!!.jsonObject["color"].toString().replace("\"",""))
             newChip.nMinMax = fGetSliderRange(jsEnums["common"]!!.jsonObject["min"].toString().replace("\"",""), jsEnums["common"]!!.jsonObject["max"].toString().replace("\"",""))
             //Get Object-Role and set Type
             with(jsEnums["common"]!!.jsonObject["role"].toString().replace("\"", "")) {
@@ -524,6 +524,14 @@ class MainActivity : ComponentActivity() {
         })
     }
 
+    fun fCheckColorCode(sColorCode:String): String {
+        try {
+            val color: Color = Color(android.graphics.Color.parseColor(sColorCode)) // Color valid, set it
+        } catch (iae: IllegalArgumentException) {
+            return "#ffff00" // Color Invalid, set to Yellow
+        }
+        return sColorCode
+    }
 
     fun fGetSliderRange(sMin:String,sMax:String): ClosedFloatingPointRange<Float> {
         var nMin: Float = 0f
@@ -576,3 +584,4 @@ class MainActivity : ComponentActivity() {
         SocketHandler.closeConnection()
     }
 }
+
