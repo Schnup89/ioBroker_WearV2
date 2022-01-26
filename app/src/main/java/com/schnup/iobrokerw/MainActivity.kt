@@ -5,53 +5,48 @@ import android.app.RemoteInput
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Base64
-
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
-
-import androidx.compose.runtime.*
-import androidx.wear.compose.material.ChipDefaults
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-
-import androidx.compose.ui.focus.focusTarget
-
-import androidx.compose.ui.text.font.FontWeight
-
-import androidx.compose.ui.unit.dp
-import androidx.wear.compose.material.*
-
-import com.schnup.iobrokerw.ui.theme.IoBrokerWTheme
-import io.socket.client.Ack
-import io.socket.client.Socket
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.lifecycleScope
-import androidx.wear.input.*
+import androidx.wear.compose.material.*
+import androidx.wear.input.RemoteInputIntentHelper
+import com.schnup.iobrokerw.ui.theme.IoBrokerWTheme
+import io.socket.client.Ack
+import io.socket.client.Socket
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import java.lang.IllegalArgumentException
-import kotlin.system.exitProcess
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 
 
 @Stable
@@ -92,6 +87,20 @@ class MainActivity : ComponentActivity() {
     @ExperimentalWearMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        /*
+        // Prefer WIFI over BT-PROXY, old but gold: https://stackoverflow.com/questions/39611338/android-volley-doesnt-work-on-local-wifi-if-3g-4g-is-on/39611651#39611651
+        // Backside: Wont Connect back to Bluetooth if WIFI Connection is lost
+        val connectivityManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        for (net in connectivityManager.allNetworks) {
+            val networkInfo = connectivityManager.getNetworkInfo(net)
+            if (networkInfo!!.type == ConnectivityManager.TYPE_WIFI) {
+                connectivityManager.bindProcessToNetwork(net)
+                break
+            }
+        }
+        */
 
 
         setContent {
