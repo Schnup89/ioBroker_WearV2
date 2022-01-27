@@ -83,6 +83,7 @@ Zu finden hier: Einstellungen - Erweiterte Funktionen - Anpassen von Tasten > Hi
 - <s>Wenn Server URL definiert ist und nicht erreichbar bleibt die App  Startbildschirm</s>  - Fixed V2.1
 - "Swipe" zu schließen aktivieren wenn kein Slider konfiguriert ist
 - <s>Rückgabewert anhand des definierten Typ Boolean/"ON","OFF"</s> <-ToggleChip ist jetzt immer boolean
+- Connection Manager implementieren und bei WiFi immer dieses zuerst nutzen
 
 In der aktellen Version sollte die App auch mit den bekannten Bugs zuverlässig laufen
 
