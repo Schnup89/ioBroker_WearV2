@@ -7,6 +7,9 @@ https://www.youtube.com/watch?v=gGTmlj9mHgY
 Icons:
 https://github.com/ioBroker/ioBroker.icons-ultimate-png
 
+Wenn die Uhr per WLAN verbunden ist, nutzt die App immer die direkte WLAN-Verbindung.  
+Wenn die Uhr nicht per WLAN mit Netzwerk verbunden ist, wird über den Bluetooth-Proxy über das Smartphone kommuniziert.  
+
 
 ## Konfiguration ioBroker
 Der [SocketIO-Adapter](https://github.com/ioBroker/ioBroker.socketio) muss installiert sein.
@@ -111,6 +114,10 @@ Da mit der Live-Status der Verbindung wichtig ist, und die kurzen Disconnects ke
 
 
 ## Changelog
+
+### 2.4 (2022-01-28)
+* (schnup89) Funktion: WLAN wird nun standardmäßig genutzt, wenn verbunden. Alternativ Bluetooth-Proxy
+* (schnup89) Funktion: Exit-Button hinzugefügt
 
 ### 2.3 (2022-01-25)
 * (schnup89) BUGFIX: Color-Code Error Handling implementiert
