@@ -1,6 +1,7 @@
 package com.schnup.iobrokerw
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.app.RemoteInput
 import android.content.Context
 import android.content.Intent
@@ -50,6 +51,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlin.system.exitProcess
 
 
 @Stable
@@ -91,7 +93,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ### Prefer WIFI over BT-PROXY if wifi is available
+        // ### Prefer WIFI over BT-PROXY if Wifi is available
         //Get Service
         val connectivityManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val callback = object : ConnectivityManager.NetworkCallback() {
@@ -376,7 +378,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
-                            item {
+                            item {              //############# Chip Settings
                                 Chip(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -414,6 +416,24 @@ class MainActivity : ComponentActivity() {
                                     enabled = true,
                                     colors = ChipDefaults.imageBackgroundChipColors(
                                         backgroundImagePainter = painterResource(id = R.drawable.wrench)
+                                    )
+                                )
+                            }
+                            item {              //############# Chip Exit
+                                Chip(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 4.dp),
+                                    label = {
+                                    },
+                                    secondaryLabel = {
+                                    },
+                                    onClick = {
+                                        exitProcess(0);
+                                    },
+                                    enabled = true,
+                                    colors = ChipDefaults.imageBackgroundChipColors(
+                                        backgroundImagePainter = painterResource(id = R.drawable.exitt)
                                     )
                                 )
                             }
