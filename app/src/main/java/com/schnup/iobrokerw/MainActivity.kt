@@ -6,6 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.Base64
 import androidx.activity.ComponentActivity
@@ -88,11 +91,23 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-        /*
-        // Prefer WIFI over BT-PROXY, old but gold: https://stackoverflow.com/questions/39611338/android-volley-doesnt-work-on-local-wifi-if-3g-4g-is-on/39611651#39611651
-        // Backside: Wont Connect back to Bluetooth if WIFI Connection is lost
+        // ### Prefer WIFI over BT-PROXY if wifi is available
+        //Get Service
         val connectivityManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            //If Wifi is available
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                //Use it!
+                connectivityManager.bindProcessToNetwork(network)
+            }
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                //Use default (BT-proxy), if no wifi available
+                connectivityManager.bindProcessToNetwork(null)
+            }
+        }
+        //First check if Wifi is connected, if yes, use it!
         for (net in connectivityManager.allNetworks) {
             val networkInfo = connectivityManager.getNetworkInfo(net)
             if (networkInfo!!.type == ConnectivityManager.TYPE_WIFI) {
@@ -100,7 +115,11 @@ class MainActivity : ComponentActivity() {
                 break
             }
         }
-        */
+        //Get notified if wifi state-changes
+        connectivityManager.registerNetworkCallback(
+            NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build(),
+            callback
+        )
 
 
         setContent {
