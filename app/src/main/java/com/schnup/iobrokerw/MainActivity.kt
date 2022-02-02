@@ -548,6 +548,7 @@ class MainActivity : ComponentActivity() {
             with(jsEnums["common"]!!.jsonObject["role"].toString().replace("\"", "")) {
                 when  {
                     startsWith("switch") -> newChip.nType = 1 //ToggleChip
+                    startsWith("scene.states") -> newChip.nType = 1 //ToggleChip
                     startsWith("level") -> newChip.nType = 2  //Slider
                     else -> {
                         newChip.nType = 0   //Chip
