@@ -45,10 +45,14 @@ Bild | JSON-Param       | Funktion                | Datentyp  | Bemerkung  |
 
 ** Anzeigetyp **  
 Die Rolle eines Objekt definiert den Anzeigetyp:  
-Switch = Toggle  
-Level = Slider  
-Alles andere = Anzeige  
-  
+
+Rolle           | Anzeige-Typ      
+--------------- | ---------------- |
+switch*         | Toggle           |
+scene.states*   | Toggle           |
+level*          | Slider           |
+Alles andere    | Wertanzeige      |
+
   
   
 ## Anordnung der Objekte
@@ -114,6 +118,9 @@ Da mit der Live-Status der Verbindung wichtig ist, und die kurzen Disconnects ke
 
 
 ## Changelog
+
+### 2.5 (2022-02-02)
+* (schnup89) Funktion: scene.states als ToggleChip hinzugefügt
 
 ### 2.4 (2022-01-28)
 * (schnup89) Funktion: WLAN wird nun standardmäßig genutzt, wenn verbunden. Alternativ Bluetooth-Proxy
