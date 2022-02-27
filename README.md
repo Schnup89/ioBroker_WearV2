@@ -71,9 +71,20 @@ Sollte ein Fehler auftren wird fast immer ein rotes X irgendwo auftreten.
 
 
 ## APK installieren
+**... über den Wear Installer:**  
 https://youtu.be/8HsfWPTFGQI
-
-
+  
+**...Alternativ über das Program adb.exe:**  
+https://dl.google.com/android/repository/platform-tools-latest-windows.zip <- adb.exe extrahieren nach z.B. C:\tmp  
+ioWearV2_5.apk nach C:\tmp\ kopieren  
+  
+- per Kommandozeile (CMD) in den Ordner C:\tmp\ wechseln
+- Auf der Uhr unter Entwickleroptionen "adb debugging" aktivieren
+- adb connect 192.168.1.100 <- ersetze IP mit der IP der Uhr, kopplung auf der uhr zulassen
+- adb install ioWearV2_5.apk
+- anstatt C:\tmp könnt Ihr natürlich auch einen anderen Ordner nutzen
+  
+  
 ## Konfiguration APP
 Server URL definieren im Format: http://192.168.10.4:8084
 
