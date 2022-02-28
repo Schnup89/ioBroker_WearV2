@@ -87,8 +87,15 @@ ioWearV2_5.apk nach C:\tmp\ kopieren
   
 ## Konfiguration APP
 Server URL definieren im Format: http://192.168.10.4:8084
-
-
+  
+  
+## Von Unterwegs die APP nutzen
+Die Uhr (galaxy watch4, andere nicht getestet) baut die Verbindung in der Regel über den Bluetooth-Proxy über das Telefon auf.  
+Das bedeutet dass die App über das SmartPhone zum ioBroker kommuniziert.  
+Ist das SmartPhone nicht verfügbar wird die App, wenn vorhanden, direkt über WLAN die Verbindung zum ioBroker aufbauen.  
+Den Bluetooth-Proxy können wir uns zu nutze machen wenn wir unterwegs sind, denn sobald das SmartPhone über einen VPN-Tunnel den ioBroker erreicht, wird damit auch die Uhr bzw. die APP eine Verbindung von unterwegs aufbauen können.  
+  
+  
 ## Schnelltaste
 Damit die APP schnell geöffnet werden kann, habe ich diese auf die "Doppelklick"-Tastenfunktion der Uhr-Taste gelegt.  
 Zu finden hier: Einstellungen - Erweiterte Funktionen - Anpassen von Tasten > Hier kann die App verlinkt werden
