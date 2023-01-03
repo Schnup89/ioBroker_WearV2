@@ -1,5 +1,5 @@
 # ioBroker_WearV2
-WearOS Application mit SocketIO und JetpackCompose
+WearOS App für Interaktion mit ioBroker 
   
 Video:
 https://www.youtube.com/watch?v=gGTmlj9mHgY
@@ -8,12 +8,16 @@ Icons:
 https://github.com/ioBroker/ioBroker.icons-ultimate-png
 
 Wenn die Uhr per WLAN verbunden ist, nutzt die App immer die direkte WLAN-Verbindung.  
-Wenn die Uhr nicht per WLAN mit Netzwerk verbunden ist, wird über den Bluetooth-Proxy über das Smartphone kommuniziert.  
+Wenn die Uhr nicht per WLAN mit Netzwerk verbunden ist, wird über den Bluetooth-Proxy des Smartphones kommuniziert.  
 
 
 ## Konfiguration ioBroker
-Der [SocketIO-Adapter](https://github.com/ioBroker/ioBroker.socketio) muss installiert sein.
-Standardmäig nutzt dieser den Port 8084, den merken wir uns für später.
+&#x1F534; Ab Version 2.6 muss der [Websockets-Adapter](https://github.com/ioBroker/ioBroker.ws) installiert sein. &#x1F534;  
+  
+Vor Version 2.6 muss der [SocketIO-Adapter](https://github.com/ioBroker/ioBroker.socketio) installiert sein.  
+Standardmäig nutzt dieser den Port 8084, den merken wir uns für später.  
+&#x1F6A7; Sollte der Websocket-Adapter bei euch noch nicht installiert sein, bitte unter der Instanz einen freien Port z.B. 8085 angeben, sonst gibt es Probleme mit dem Socket.IO Adapter.  
+Ich habe bei mir den Socket.IO Adapter deinstalliert und den Websocketsadapter installiert und habe keine Probleme damit. Ich kann jedoch nicht versprechen dass es bei euch genauso ist.  
 
 **Grundkonfiguration**
 - Raum "WearOS" unter Aufzählung->Räume erstellen
@@ -46,14 +50,16 @@ Bild | JSON-Param       | Funktion                | Datentyp  | Bemerkung  |
 ** Anzeigetyp **  
 Die Rolle eines Objekt definiert den Anzeigetyp:  
 
-Rolle           | Anzeige-Typ      
---------------- | ---------------- |
-switch*         | Toggle           |
-scene.states*   | Toggle           |
-level*          | Slider           |
-Alles andere    | Wertanzeige      |
+Rolle           | Anzeige-Typ      | Extra           |
+--------------- | ---------------- | ----------------
+switch*         | Toggle           |                 |
+scene.states*   | Toggle (Taster)  | "desc": "press" |
+scene.states*   | Toggle           |                 |
+level*          | Slider           |                 |
+Alles andere    | Wertanzeige      |                 |
 
-  
+Um den Taster anzuzeigen im Objekt den Wert "desc" auf "press" ohne " setzen.
+
   
 ## Anordnung der Objekte
 Leider ist es aktuell in ioBroker nicht möglich Objekte in Räumen per "Drag&Drop" zu sortieren.  
@@ -103,12 +109,12 @@ Zu finden hier: Einstellungen - Erweiterte Funktionen - Anpassen von Tasten > Hi
 
 
 ## Known Bugs / Verbesserungen
-- Sporadisch kurzer Verbindungsverlust, siehe Websocket vs PollingXHR
+- <s>Sporadisch kurzer Verbindungsverlust, siehe Websocket vs PollingXHR</s> -  Fixed V2.6
 - <s>Manchmal werden mehrere "Instanzen" erstellt </s>
 - <s>Wenn Server URL definiert ist und nicht erreichbar bleibt die App  Startbildschirm</s>  - Fixed V2.1
 - "Swipe" zu schließen aktivieren wenn kein Slider konfiguriert ist
 - <s>Rückgabewert anhand des definierten Typ Boolean/"ON","OFF"</s> <-ToggleChip ist jetzt immer boolean
-- Connection Manager implementieren und bei WiFi immer dieses zuerst nutzen
+- <s>Connection Manager implementieren und bei WiFi immer dieses zuerst nutzen</s>  - Sollte kein Problem mehr sein, V2.6
 
 In der aktellen Version sollte die App auch mit den bekannten Bugs zuverlässig laufen
 
@@ -121,21 +127,14 @@ Leider ist dieses noch relativ "neu" und es mussten im Code einige (vermultiche)
 Bzgl. der Performance hoffe ich hier auf einige Updates in der Zukunft.  
 
 
-## PollingXHR vs Websocket
-https://github.com/Schnup89/ioBroker_WearV2/blob/265252d2d10f3a0d4c854a4bccde8b2aa92a5e3d/app/src/main/java/com/schnup/iobrokerw/SocketHandler.kt
--> Siehe "mOpts.transports ="  
-"PollingXHR" 
-+ Sobald die SocketIO Verbindung zum ioBroker unterbrochen ist, wird innerhalb von Sekunden ein rotes "X" angezeigt.
-- Leider unterbricht (bei mir) die Verbindung manchmal für einen kurzen Moment (sichtbar am roten "X")
-  
-"Websocket"  
-+ Stabile Verbindung ohne kurze abbrüche
-- (Bei mir) erkennung eines Verbindungsverlust erst nach 1,5 Minuten
-
-Da mit der Live-Status der Verbindung wichtig ist, und die kurzen Disconnects keine Fehler produzieren, habe ich Standardmäig diesen im Einsatz.
-
 
 ## Changelog
+
+### 2.6 (2023-01-3)
+* (schnup89) Funktion: Farbauswahl für "Chips" hinzugefügt
+* (schnup89) Funktion: Taster (Schalter) hinzugefügt
+* (schnup89) Funktion: (Compose, Kotlin) Libraries etc. auf aktuellen Stand importiert
+* (schnup89) Funktion: !!! Socket.IO wird ioBroker-Seitig nicht mehr weiterentwickelt, deshalb umstieg auf Websockockets, anderer Adapter notwendig
 
 ### 2.5 (2022-02-02)
 * (schnup89) Funktion: scene.states als ToggleChip hinzugefügt
