@@ -182,14 +182,14 @@ class MainActivity : ComponentActivity(), MessageListener {
                                 top = 40.dp,
                                 start = 10.dp,
                                 end = 10.dp,
-                                bottom = 40.dp
+                                bottom = 0.dp
                             ),
                             verticalArrangement = Arrangement.Center,
                             state = scalingLazyListState
                         ) {
-                            item {
-                                //Only Show Notify-Text if its not empty
-                                if (csNotify.isNotEmpty()) {
+                            if (csNotify.isNotEmpty()) {
+                                item {
+                                    //Only Show Notify-Text if its not empty
                                     Text(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -511,9 +511,9 @@ class MainActivity : ComponentActivity(), MessageListener {
 
     private fun fSetupSocket(): Boolean {
         //Connect to ioBroker
-        sUrl.value = sUrl.value + "/?sid=admin"
+        if (sUrl.value.endsWith("/?sid=admin")) sUrl.value = sUrl.value.dropLast(11)    //Remove sid from url and save it (Workaround old Version)
         if (WebSocketManager.isConnect()) WebSocketManager.close()
-        if (!WebSocketManager.init(sUrl.value, this)) return false
+        if (!WebSocketManager.init(sUrl.value + "/?sid=admin", this)) return false
         if (!WebSocketManager.connect()) return false
 
         Log.d(WebSocketManager.TAG, "Main: Connect OK")
@@ -573,7 +573,7 @@ class MainActivity : ComponentActivity(), MessageListener {
     private fun fSetupList(jRes: JSONArray){
         //Fetch WearOS enum to get all Object/StateID's
         try {
-            if (!lChips.isEmpty()) return
+            //if (!lChips.isEmpty()) return
             //Get enum member ID's from json
             val jsEnums = Json.parseToJsonElement(jRes[1].toString()).jsonObject
             val jaIDs = jsEnums["common"]!!.jsonObject["members"]!!.jsonArray
