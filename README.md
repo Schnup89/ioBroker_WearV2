@@ -39,6 +39,7 @@ Bild | JSON-Param                   | Funktion              | Datentyp    | Beme
 5    | "common"-"color"             | Farbe bei aktiv.      | Zeichenk.   | Setzen über "common"-Reiter
 6    | "common"-"min"               | Bei Slider Min Wert   | Zahl        | Setzen über "common"-Reiter
 7    | "common"-"max"               | Bei Slider Man Wert   | Zahl        | Setzen über "common"-Reiter
+7    | "common"-"steps"             | Bei Slider Schritte   | Zahl        | Setzen über "common"-Reiter
 8    | "common"-"role"              | Anzeigetyp            | Zeichenk.   | Setzen über "common"-Reiter
 8    | "common"-"color-background"  | Chip-Hintergrundfarbe | Zeichenk.   | Nimmt als Wert Color-Code wie "color"-Parameter
 
@@ -91,6 +92,11 @@ ioWearV2_5.apk nach C:\tmp\ kopieren
 - adb install ioWearV2_5.apk
 - anstatt C:\tmp könnt Ihr natürlich auch einen anderen Ordner nutzen
   
+Sollte bei einem Update ein Fehler bei der Installation auftreten, die App im Menü mit einem langen Klick deinstallieren.  
+Alternativ mit folgendem adb-Kommando:  
+
+adb uninstall "com.schnup.iobrokerw"
+  
   
 ## Konfiguration APP
 Server URL definieren im Format: http://192.168.10.4:8084
@@ -131,7 +137,16 @@ Bzgl. der Performance hoffe ich hier auf einige Updates in der Zukunft.
 
 ## Changelog
 
-### 2.6 (2023-01-3)
+### 2.7 (2023-01-06)
+* (schnup89) Funktion: Icon's werden nicht mehr standardmäßig Gelb eingefärbt, dafür kann der "color" Parameter verwendet werden
+* (schnup89) Funktion: Slider Unterstützt nun auch den "Step" Parameter von ioBroker
+* (schnup89) Bugfix: Issue #8 Bezel scroll funktioniert manchmal nicht
+* (schnup89) Bugfix: Issue #7 Farben werden immer eingefärbt wurde angepasst
+* (schnup89) Bugfix: Issue #6 Slider Absturz
+* (schnup89) Bugfix: Issue #4 App startet länger &#x1F534;  Build Optionen gefixed, evtl. Neuinstallation der App notwendig
+* (schnup89) Bugfix: Issue #5 Freier Platz am oberen Rand der Liste gefixed 
+
+### 2.6 (2023-01-03)
 * (schnup89) Funktion: Farbauswahl für "Chips" hinzugefügt
 * (schnup89) Funktion: Taster (Schalter) hinzugefügt
 * (schnup89) Funktion: (Compose, Kotlin) Libraries etc. auf aktuellen Stand importiert
