@@ -65,6 +65,7 @@ data class dcIOChips(
     var sColorOn: String = "null",
     var sColorBgnd: String = "null",
     var nMinMax: ClosedFloatingPointRange<Float> = (0f).rangeTo(100f),
+    var nSteps: Int? = 1,
     var nType: Int = 0,                     //0 = Chip, 1 = ToggleChip, 2 = Slider  Unknown = Chip
     var bUpdateCompose: Boolean = false     //Used for Change value to trigger Compose Update
 )
@@ -133,7 +134,8 @@ class MainActivity : ComponentActivity(), MessageListener {
 
                     Scaffold(
                         modifier = Modifier
-                            .background(Color.Black),
+                            .background(Color.Black)
+                            .focusable(false),
                         timeText = {
                             TimeText(
                                 startCurvedContent = {
@@ -161,7 +163,6 @@ class MainActivity : ComponentActivity(), MessageListener {
                     ) {
                         ScalingLazyColumn(
                             modifier = Modifier
-                                .focusable()
                                 .fillMaxSize()
                                 .onPreRotaryScrollEvent {
                                     coroutineScope.launch {
@@ -217,7 +218,7 @@ class MainActivity : ComponentActivity(), MessageListener {
                                                     //Check if Icon present
                                                     if ((myChip.sIconB64.isNotEmpty()) and (myChip.sIconB64 != "null")) {
                                                         //Check if ON-Color is provided and value is ON
-                                                        if (myChip.sVal.toBoolean()) cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
+                                                        if (myChip.sVal.toBoolean() && myChip.sColorOn != "null") cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
                                                         Icon(
                                                             bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
                                                             contentDescription = "Custom",
@@ -249,7 +250,11 @@ class MainActivity : ComponentActivity(), MessageListener {
                                     }
                                     2 -> {   //############# Level / Slider
                                         var cBgnd: Color = Color.DarkGray
+                                        var cOn: Color = Color.Yellow
+                                        var nSteps: Int = 1
                                         if (myChip.sColorBgnd != "null") cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
+                                        if (myChip.sColorOn != "null") cOn = Color(android.graphics.Color.parseColor(myChip.sColorOn))
+                                        if (myChip.nSteps != null) nSteps = myChip.nSteps!!
                                         Chip(
                                             colors = ChipDefaults.primaryChipColors(
                                                 backgroundColor = cBgnd
@@ -279,10 +284,11 @@ class MainActivity : ComponentActivity(), MessageListener {
                                                 )
                                             },
                                             secondaryLabel = {
-                                                if (myChip.sVal.isDigitsOnly()) {
+                                               if (myChip.sVal.isDigitsOnly()) {
                                                     Slider(
                                                         modifier = Modifier
-                                                            .fillMaxWidth()
+                                                            .fillParentMaxWidth()
+                                                            .fillParentMaxHeight()
                                                             .wrapContentSize(align = Alignment.BottomEnd),
                                                         value = myChip.sVal.toFloat(),
                                                         onValueChange = {
@@ -293,36 +299,17 @@ class MainActivity : ComponentActivity(), MessageListener {
                                                         },
                                                         enabled = myChip.bWriteable,
                                                         valueRange = myChip.nMinMax,
+                                                        steps = nSteps,
                                                         colors =
-                                                        SliderDefaults.colors(
-                                                            activeTickColor = Color(
-                                                                android.graphics.Color.parseColor(
-                                                                    myChip.sColorOn
-                                                                )
-                                                            ),
-                                                            inactiveTickColor = Color(
-                                                                android.graphics.Color.parseColor(
-                                                                    myChip.sColorOn
-                                                                )
-                                                            ),
-                                                            inactiveTrackColor = Color(
-                                                                android.graphics.Color.parseColor(
-                                                                    myChip.sColorOn
-                                                                )
-                                                            ),
-                                                            activeTrackColor = Color(
-                                                                android.graphics.Color.parseColor(
-                                                                    myChip.sColorOn
-                                                                )
-                                                            ),
-                                                            thumbColor = Color(
-                                                                android.graphics.Color.parseColor(
-                                                                    myChip.sColorOn
-                                                                )
+                                                            SliderDefaults.colors(
+                                                                activeTickColor = cOn,
+                                                                inactiveTickColor = cOn,
+                                                                inactiveTrackColor = cOn,
+                                                                activeTrackColor = cOn,
+                                                                thumbColor = cOn
                                                             )
-                                                        )
                                                     )
-                                                }
+                                               }
                                             },
                                             onClick = {},
                                             enabled = myChip.bWriteable,
@@ -512,7 +499,7 @@ class MainActivity : ComponentActivity(), MessageListener {
     private fun fSetupSocket(): Boolean {
         //Connect to ioBroker
         if (sUrl.value.endsWith("/?sid=admin")) sUrl.value = sUrl.value.dropLast(11)    //Remove sid from url and save it (Workaround old Version)
-        if (WebSocketManager.isConnect()) WebSocketManager.close()
+        WebSocketManager.close()
         if (!WebSocketManager.init(sUrl.value + "/?sid=admin", this)) return false
         if (!WebSocketManager.connect()) return false
 
@@ -584,7 +571,7 @@ class MainActivity : ComponentActivity(), MessageListener {
 
                 //Subscribe each ID for changes
                 WebSocketManager.sendCallback("subscribe",sRawID)
-                WebSocketManager.sendCallback("getObject",sRawID)
+                if (lChips.isEmpty()) WebSocketManager.sendCallback("getObject",sRawID)
             }
             bIsLoading.value = false
         }catch (e: Exception){
@@ -609,9 +596,10 @@ class MainActivity : ComponentActivity(), MessageListener {
         newChip.sUnit = jsEnums["common"]!!.jsonObject["unit"].toString().replace("\"","")
         newChip.sIconB64 = jsEnums["common"]!!.jsonObject["icon"].toString().replace("\"","")
         newChip.bWriteable  = jsEnums["common"]!!.jsonObject["write"].toString().replace("\"","").toBoolean()
-        newChip.sColorOn = fCheckColorCode(jsEnums["common"]!!.jsonObject["color"].toString().replace("\"",""),"#ffff00")
-        newChip.sColorBgnd = fCheckColorCode(jsEnums["common"]!!.jsonObject["color-background"].toString().replace("\"",""),"null")
+        newChip.sColorOn = fCheckColorCode(jsEnums["common"]!!.jsonObject["color"].toString().replace("\"",""))
+        newChip.sColorBgnd = fCheckColorCode(jsEnums["common"]!!.jsonObject["color-background"].toString().replace("\"",""))
         newChip.nMinMax = fGetSliderRange(jsEnums["common"]!!.jsonObject["min"].toString().replace("\"",""), jsEnums["common"]!!.jsonObject["max"].toString().replace("\"",""))
+        newChip.nSteps = jsEnums["common"]!!.jsonObject["step"].toString().replace("\"","").toIntOrNull()
         //Get Object-Role and set Type
         with(jsEnums["common"]!!.jsonObject["role"].toString().replace("\"", "")) {
             when  {
@@ -656,12 +644,12 @@ class MainActivity : ComponentActivity(), MessageListener {
         fTriggerChipListComposeUpdate(nPos)
     }
 
-    private fun fCheckColorCode(sColorCode:String, sDefColor:String): String {
+    private fun fCheckColorCode(sColorCode:String): String {
         try {
             val color: Color = Color(android.graphics.Color.parseColor(sColorCode)) // Color valid, set it
             return sColorCode
         } catch (iae: IllegalArgumentException) {
-            return sDefColor //"#ffff00" // Color Invalid, set to Yellow
+            return "null" //"#ffff00" // Color Invalid, set to Yellow
         }
     }
 
@@ -680,7 +668,8 @@ class MainActivity : ComponentActivity(), MessageListener {
         }
         try {
             return nMin.rangeTo(nMax)
-        }catch (_:java.lang.Exception){}
+        } catch (_: java.lang.Exception) {
+        }
         return nMin.rangeTo(nMax)
     }
 
@@ -710,5 +699,6 @@ class MainActivity : ComponentActivity(), MessageListener {
             BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size).asImageBitmap()
         }
     }
+
 }
 
