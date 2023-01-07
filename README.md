@@ -137,6 +137,9 @@ Bzgl. der Performance hoffe ich hier auf einige Updates in der Zukunft.
 
 ## Changelog
 
+### 2.7.1 (2023-01-07)
+* (schnup89) Bugfix: Issue #9 Bei "Taster" wurde Icon falsch eingefärbt
+
 ### 2.7 (2023-01-06)
 * (schnup89) Funktion: Icon's werden nicht mehr standardmäßig Gelb eingefärbt, dafür kann der "color" Parameter verwendet werden
 * (schnup89) Funktion: Slider Unterstützt nun auch den "Step" Parameter von ioBroker
