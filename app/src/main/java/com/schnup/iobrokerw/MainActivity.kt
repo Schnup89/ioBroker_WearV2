@@ -251,7 +251,7 @@ class MainActivity : ComponentActivity(), MessageListener {
                                     2 -> {   //############# Level / Slider
                                         var cBgnd: Color = Color.DarkGray
                                         var cOn: Color = Color.Yellow
-                                        var nSteps: Int = 1
+                                        var nSteps = 1
                                         if (myChip.sColorBgnd != "null") cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
                                         if (myChip.sColorOn != "null") cOn = Color(android.graphics.Color.parseColor(myChip.sColorOn))
                                         if (myChip.nSteps != null) nSteps = myChip.nSteps!!
@@ -263,10 +263,15 @@ class MainActivity : ComponentActivity(), MessageListener {
                                                 .fillMaxWidth()
                                                 .padding(top = 4.dp),
                                             icon = {
+                                                var cStateON: Color = Color.Unspecified
+                                                //Check if Icon present
                                                 if ((myChip.sIconB64.isNotEmpty()) and (myChip.sIconB64 != "null")) {
+                                                    //Check if ON-Color is provided and value is ON
+                                                    if (myChip.sVal.toBoolean() && myChip.sColorOn != "null") cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
                                                     Icon(
                                                         bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
                                                         contentDescription = "Custom",
+                                                        tint = cStateON,
                                                         modifier = Modifier
                                                             .padding(top = 3.dp, bottom = 3.dp)
                                                             .wrapContentSize(align = Alignment.Center),
@@ -342,10 +347,15 @@ class MainActivity : ComponentActivity(), MessageListener {
                                                 .fillMaxWidth()
                                                 .padding(top = 4.dp),
                                             icon = {
+                                                var cStateON: Color = Color.Unspecified
+                                                //Check if Icon present
                                                 if ((myChip.sIconB64.isNotEmpty()) and (myChip.sIconB64 != "null")) {
+                                                    //Check if ON-Color is provided and value is ON
+                                                    if (myChip.sVal.toBoolean() && myChip.sColorOn != "null") cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
                                                     Icon(
                                                         bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
                                                         contentDescription = "Custom",
+                                                        tint = cStateON,
                                                         modifier = Modifier
                                                             .padding(top = 3.dp, bottom = 3.dp)
                                                             .wrapContentSize(align = Alignment.Center),
