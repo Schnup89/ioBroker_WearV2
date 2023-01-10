@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 object WebSocketManager {
     const val TAG = "Webscks"
-    private const val MILLIS = 5000
+    private const val MILLIS = 1000
     private lateinit var client: OkHttpClient
     private lateinit var request: Request
     private lateinit var messageListener: MessageListener
@@ -20,9 +20,9 @@ object WebSocketManager {
     fun init(url: String, _messageListener: MessageListener) : Boolean {
         try {
             client = OkHttpClient.Builder()
-                .writeTimeout(5, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS)
-                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(2, TimeUnit.SECONDS)
+                .readTimeout(2, TimeUnit.SECONDS)
+                .connectTimeout(5, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
                 .build()
             request = Request.Builder().url(url).build()
