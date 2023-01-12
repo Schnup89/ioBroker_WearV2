@@ -687,7 +687,7 @@ class MainActivity : ComponentActivity(), MessageListener {
         if (!bSliderCoolDown) {
             bSliderCoolDown = true
             WebSocketManager.sendMessage(JSONArray(listOf(3,
-                WebSocketManager.nWSID,"setState",JSONArray(listOf(sStateID,nVal.toString())))).toString())
+                WebSocketManager.nWSID,"setState",JSONArray(listOf(sStateID,nVal)))).toString())
             delay(2000)
             bSliderCoolDown = false
             WebSocketManager.sendMessage(JSONArray(listOf(3,
