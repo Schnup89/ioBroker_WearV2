@@ -251,10 +251,10 @@ class MainActivity : ComponentActivity(), MessageListener {
                                     2 -> {   //############# Level / Slider
                                         var cBgnd: Color = Color.DarkGray
                                         var cOn: Color = Color.Yellow
-                                        var nSteps = 1
+                                        var nSteps = 0
                                         if (myChip.sColorBgnd != "null") cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
                                         if (myChip.sColorOn != "null") cOn = Color(android.graphics.Color.parseColor(myChip.sColorOn))
-                                        if (myChip.nSteps != null) nSteps = myChip.nSteps!!
+                                        if (myChip.nSteps != null) nSteps = ((myChip.nMinMax!!.endInclusive-myChip.nMinMax!!.start) / myChip.nSteps!!).toInt()
                                         Chip(
                                             colors = ChipDefaults.primaryChipColors(
                                                 backgroundColor = cBgnd
