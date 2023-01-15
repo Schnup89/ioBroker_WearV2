@@ -251,10 +251,10 @@ class MainActivity : ComponentActivity(), MessageListener {
                                     2 -> {   //############# Level / Slider
                                         var cBgnd: Color = Color.DarkGray
                                         var cOn: Color = Color.Yellow
-                                        var nSteps = 1
+                                        var nSteps = 0
                                         if (myChip.sColorBgnd != "null") cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
                                         if (myChip.sColorOn != "null") cOn = Color(android.graphics.Color.parseColor(myChip.sColorOn))
-                                        if (myChip.nSteps != null) nSteps = myChip.nSteps!!
+                                        if (myChip.nSteps != null) nSteps = ((myChip.nMinMax.endInclusive-myChip.nMinMax.start) / myChip.nSteps!!).toInt()
                                         Chip(
                                             colors = ChipDefaults.primaryChipColors(
                                                 backgroundColor = cBgnd
@@ -438,12 +438,20 @@ class MainActivity : ComponentActivity(), MessageListener {
                                     label = {
                                         Text(
                                             modifier = Modifier
-                                                .fillMaxWidth()
                                                 .wrapContentSize(align = Alignment.TopStart),
                                             color = Color.White,
                                             fontSize = 15.sp,
                                             maxLines = 1,
                                             text = "ioBroker-URL"
+                                        )
+                                        Text(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .wrapContentSize(align = Alignment.TopEnd),
+                                        color = Color.White,
+                                        fontSize = 12.sp,
+                                        maxLines = 1,
+                                        text = "v" + BuildConfig.VERSION_NAME
                                         )
                                     },
                                     secondaryLabel = {
@@ -687,11 +695,11 @@ class MainActivity : ComponentActivity(), MessageListener {
         if (!bSliderCoolDown) {
             bSliderCoolDown = true
             WebSocketManager.sendMessage(JSONArray(listOf(3,
-                WebSocketManager.nWSID,"setState",JSONArray(listOf(sStateID,nVal.toString())))).toString())
+                WebSocketManager.nWSID,"setState",JSONArray(listOf(sStateID,nVal)))).toString())
             delay(2000)
             bSliderCoolDown = false
             WebSocketManager.sendMessage(JSONArray(listOf(3,
-                WebSocketManager.nWSID,"setState",JSONArray(listOf(sStateID, lChips[nIndex].sVal)))).toString())
+                WebSocketManager.nWSID,"setState",JSONArray(listOf(sStateID, lChips[nIndex].sVal.toInt())))).toString())
         }
     }
 
