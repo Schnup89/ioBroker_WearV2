@@ -139,8 +139,8 @@ Bzgl. der Performance hoffe ich hier auf einige Updates in der Zukunft.
 
 ### 2.8 (2023-01-16)
 * (schnup89) Bugfix: Issue #10 Langsamer start durch Websockets-Timer gelöst
-* (schnup89) Bugfix: PR #11 Slider Steps und RÜckgabewert korrigiert, danke @MDeeApp
-* (schnup89) Funktion: Versionsanzeige auf "Setiings"-Schaltfläche
+* (@MDeeApp) Bugfix: PR #11 Slider Steps und RÜckgabewert korrigiert, danke @MDeeApp
+* (schnup89) Funktion: Versionsanzeige auf "Settings"-Schaltfläche
 
 ### 2.7.1 (2023-01-07)
 * (schnup89) Bugfix: Issue #9 Bei "Taster" wurde Icon falsch eingefärbt
