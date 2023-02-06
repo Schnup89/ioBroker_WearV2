@@ -150,7 +150,7 @@ Bzgl. der Performance hoffe ich hier auf einige Updates in der Zukunft.
 
 ### 2.9 (2023-02-06)
 * (schnup89) Bugfix: Issue #13 Abfangen von Fehlerszenarien (Kein Connect, Enum nicht korrekt)
-* (schnup89) Bugfix: Issue #14 Slider Korrektur, bei mehr als einem Slider wurde alle gleichzeitig aktiv
+* (schnup89) Bugfix: Issue #14 Taster Korrektur, bei mehr als einem Taster wurde alle gleichzeitig aktiv
 * (schnup89) Sonstiges: Grade-Upgrade + Automatic Keystore signing
 
 ### 2.8 (2023-01-16)
