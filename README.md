@@ -102,6 +102,17 @@ adb uninstall "com.schnup.iobrokerw"
 Server URL definieren im Format: http://192.168.10.4:8084
   
   
+## Fehlermeldungen
+Fehlermeldungen werden in der Objekt-Liste ganz oben angezeigt, hier die möglichen Fehlermeldungen und Lösungen:
+
+Fehlermeldung          | Lösung                 | 
+---------------------- | ---------------------  | 
+Bitte Server angeben   | URL konfigurieren          |  
+Not reachable   | Der Websocket-Dienst ist unter der angegeben URL nicht erreichbar. URL sollte, wenn von Webbrowser aufgerufen "Not implemented" anzeigen  | 
+Enum WearOS not found  | Der Raum wurde in ioBroker nicht gefunden, bitte auf Groß und Kleinschreibung achten. Mit aktiviertem Expertenmodus in der Objektansicht des ioBroker sollte folgendes Objekt exisiteren: enum.rooms.WearOS   |     
+     
+  
+  
 ## Von Unterwegs die APP nutzen
 Die Uhr (galaxy watch4, andere nicht getestet) baut die Verbindung in der Regel über den Bluetooth-Proxy über das Telefon auf.  
 Das bedeutet dass die App über das SmartPhone zum ioBroker kommuniziert.  
@@ -136,6 +147,11 @@ Bzgl. der Performance hoffe ich hier auf einige Updates in der Zukunft.
 
 
 ## Changelog
+
+### 2.9 (2023-02-06)
+* (schnup89) Bugfix: Issue #13 Abfangen von Fehlerszenarien (Kein Connect, Enum nicht korrekt)
+* (schnup89) Bugfix: Issue #14 Slider Korrektur, bei mehr als einem Slider wurde alle gleichzeitig aktiv
+* (schnup89) Sonstiges: Grade-Upgrade + Automatic Keystore signing
 
 ### 2.8 (2023-01-16)
 * (schnup89) Bugfix: Issue #10 Langsamer start durch Websockets-Timer gelöst
