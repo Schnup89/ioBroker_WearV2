@@ -203,7 +203,7 @@ Bzgl. der Performance hoffe ich hier auf einige Updates in der Zukunft.
 ## License
 MIT License
 
-Copyright (c) 2022 Author <tobias_tsafi@gmx.de>
+Copyright (c) 2023 Author <tobias_tsafi@gmx.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
