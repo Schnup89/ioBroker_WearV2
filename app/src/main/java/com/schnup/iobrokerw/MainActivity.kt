@@ -77,6 +77,8 @@ class MainActivity : ComponentActivity(), MessageListener {
     private val lChips = mutableStateListOf<dcIOChips>()
     private var bIsLoading = MutableStateFlow(true)
     private var bSliderCoolDown = false
+    private var nGetEnumsReqID = 0
+    private var nConFailedCnt = 0
 
     //Compose update triggers automaticly if a chip is added oder removed, but not on changes inside the chip (dcIOChip-class)
     private fun fTriggerChipListComposeUpdate(nIndex: Int){
@@ -100,8 +102,6 @@ class MainActivity : ComponentActivity(), MessageListener {
             val csUrl by sUrl.collectAsState()
             val cbIsLoading by bIsLoading.collectAsState()
             val hHaptic = LocalHapticFeedback.current
-            val interactionSource = remember { MutableInteractionSource() }
-            val isPressed by interactionSource.collectIsPressedAsState()
 
 
             if (cbIsLoading) {
@@ -321,6 +321,8 @@ class MainActivity : ComponentActivity(), MessageListener {
                                         )
                                     }
                                     3 -> {   //############## Switch PressButton
+                                        val interactionSource = remember { MutableInteractionSource() }
+                                        val isPressed by interactionSource.collectIsPressedAsState()
                                         var cBgnd: Color = Color.DarkGray
                                         if (myChip.sColorBgnd != "null") cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
                                         if (isPressed) {
@@ -529,11 +531,17 @@ class MainActivity : ComponentActivity(), MessageListener {
         val arg = JSONArray(listOf("WearOS"))
         WebSocketManager.sendMessage(JSONArray(listOf(3,WebSocketManager.nWSID,"name",arg)).toString())
         sIndicator.value = "✓"
+        nConFailedCnt = 0
     }
 
     override fun onConnectFailed() {
         sIndicator.value = "X"
         Log.d(WebSocketManager.TAG, "Connection Failed")
+        nConFailedCnt++
+        if (nConFailedCnt > 3 && bIsLoading.value) {
+            sNotify.value = "ioBroker not reachable! Restart App!"
+            bIsLoading.value = false
+        }
     }
 
     override fun onClose() {
@@ -555,9 +563,15 @@ class MainActivity : ComponentActivity(), MessageListener {
             0,3 -> {                                                                    //On Message
                 when (jMsg[2]) {                                                        //Check Message Topic
                     "___ready___" -> {                                                  //On First "Ready" get WearOS Enums    //Fetch WearOS enum to get all Object/StateID's
+                        nGetEnumsReqID = WebSocketManager.nWSID+1
                         WebSocketManager.sendCallback("getObject","enum.rooms.WearOS")
                     }
                     "getObject" -> {
+                        if (jMsg[1] == nGetEnumsReqID) //If this is the request fpr enums.room.WearOS
+                            if (jMsg[3].toString() == "[null,null]") {
+                                sNotify.value = "Enum \"WearOS\" not Found!"
+                                bIsLoading.value = false
+                            }
                         val jArg = JSONObject(JSONArray(jMsg[3].toString())[1].toString())
                         when (jArg["_id"]) {
                             "enum.rooms.WearOS" -> fSetupList(JSONArray(jMsg[3].toString()))
@@ -591,6 +605,7 @@ class MainActivity : ComponentActivity(), MessageListener {
                 WebSocketManager.sendCallback("subscribe",sRawID)
                 if (lChips.isEmpty()) WebSocketManager.sendCallback("getObject",sRawID)
             }
+            sNotify.value = ""
             bIsLoading.value = false
         }catch (e: Exception){
             sNotify.value = "Kein WearOS Raum gefunden!"
