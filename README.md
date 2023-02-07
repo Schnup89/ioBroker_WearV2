@@ -1,6 +1,13 @@
 # ioBroker_WearV2
 WearOS App für Interaktion mit ioBroker 
   
+
+  <p float="left">
+    <img src="https://user-images.githubusercontent.com/4582016/217196589-1595ac23-23c8-474b-90e6-fc9143104dd7.png" width=25% height=25%>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <img src="https://user-images.githubusercontent.com/4582016/217198678-c82a9b03-53a4-4472-ada1-0ffc9cb38ab4.gif" width=25% height=25%>
+  </p>
+
 Video:
 https://www.youtube.com/watch?v=gGTmlj9mHgY
 
