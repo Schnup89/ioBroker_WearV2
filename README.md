@@ -38,9 +38,9 @@ Ich habe bei mir den Socket.IO Adapter deinstalliert und den Websocketsadapter i
 Bild | JSON-Param                   | Funktion              | Datentyp    | Bemerkung  |
 ---- | ---------------------------- | --------------------- | ----------- | ---------- |
 1    | "common"-"name"              | Anzeigename           | Zeichenk.   | Setzen über "common"-Reiter
-2    | "common"-"unit"              | Einheit (%,°C, etc)   | Zeichenk.   |
+2    | "common"-"unit"              | Einheit (%,°C, etc)   | Zeichenk.   | Setzen über "common"-Reiter
 3    | "common"-"icon"              | Icon                  | Zeichenk.   | Setzen über "common"-Reiter (base64)
-4    | "common"-"write"             | ReadOnly wenn false   | Boolean     | 
+4    | "common"-"write"             | ReadOnly wenn false   | Boolean     | Setzen über "common"-Reiter
 5    | "common"-"color"             | Farbe bei aktiv.      | Zeichenk.   | Setzen über "common"-Reiter
 6    | "common"-"min"               | Bei Slider Min Wert   | Zahl        | Setzen über "common"-Reiter
 7    | "common"-"max"               | Bei Slider Man Wert   | Zahl        | Setzen über "common"-Reiter
