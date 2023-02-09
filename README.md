@@ -32,31 +32,27 @@ Ich habe bei mir den Socket.IO Adapter deinstalliert und den Websocketsadapter i
 
 ![image](https://user-images.githubusercontent.com/28166743/150635785-b8b4d6be-9404-412b-8c38-814864c167bb.png)
 
-
-
 **Objekt Eigenschaften**
 - Um ein Object/State nach eigenen Wünschen daruzustellen, gibt es folgende Parameter im Object-JSON:
 
 Bild | JSON-Param                   | Funktion              | Datentyp    | Bemerkung  |
 ---- | ---------------------------- | --------------------- | ----------- | ---------- |
-1    | "common"-"name"              | Anzeigename           | Zeichenk.   |
+1    | "common"-"name"              | Anzeigename           | Zeichenk.   | Setzen über "common"-Reiter
 2    | "common"-"unit"              | Einheit (%,°C, etc)   | Zeichenk.   |
-3    | "common"-"icon"              | Icon                  | Zeichenk.   | Setzen über "common"-Reiter
+3    | "common"-"icon"              | Icon                  | Zeichenk.   | Setzen über "common"-Reiter (base64)
 4    | "common"-"write"             | ReadOnly wenn false   | Boolean     | 
 5    | "common"-"color"             | Farbe bei aktiv.      | Zeichenk.   | Setzen über "common"-Reiter
 6    | "common"-"min"               | Bei Slider Min Wert   | Zahl        | Setzen über "common"-Reiter
 7    | "common"-"max"               | Bei Slider Man Wert   | Zahl        | Setzen über "common"-Reiter
 7    | "common"-"steps"             | Bei Slider Schritte   | Zahl        | Setzen über "common"-Reiter
 8    | "common"-"role"              | Anzeigetyp            | Zeichenk.   | Setzen über "common"-Reiter
-8    | "common"-"color-background"  | Chip-Hintergrundfarbe | Zeichenk.   | Nimmt als Wert Color-Code wie "color"-Parameter
-
-
+8    | "common"-"colorBackground"   | Chip-Hintergrundfarbe | Zeichenk.   | Nimmt als Wert Color-Code wie "color"-Parameter
 
 ![image](https://user-images.githubusercontent.com/28166743/150635645-0b8cd1ad-fecb-432a-87d0-0ceeb7a98afd.png)
 ![image](https://user-images.githubusercontent.com/28166743/150635717-40ae2677-9da2-4fe0-8f90-2699425a278c.png)
 
+**Anzeigetyp**
 
-** Anzeigetyp **  
 Die Rolle eines Objekt definiert den Anzeigetyp:  
 
 Rolle           | Anzeige-Typ      | Extra           |
@@ -67,13 +63,13 @@ scene.states*   | Toggle           |                 |
 level*          | Slider           |                 |
 Alles andere    | Wertanzeige      |                 |
 
-Um den Taster anzuzeigen im Objekt den Wert "desc" auf "press" ohne " setzen.
+Um den Taster anzuzeigen im Objekt den Wert `common.desc` auf `press` setzen.
 
   
 ## Anordnung der Objekte
-Leider ist es aktuell in ioBroker nicht möglich Objekte in Räumen per "Drag&Drop" zu sortieren.  
+Leider ist es aktuell in ioBroker nicht möglich Objekte in Räumen per `Drag&Drop` zu sortieren.  
 Die Objekte in den Räume können hier in der Reihenfolge geändert werden:  
-Objekt-Baum mit Expertenansicht öffnen und mit dem Schraubenschlüssel bei "enum.rooms.WearOS" in der JSON die Reihenfolge von "members" bearbeiten.  
+Objekt-Baum mit Expertenansicht öffnen und mit dem Schraubenschlüssel bei `enum.rooms.WearOS` in der JSON die Reihenfolge von `members` bearbeiten.  
 ! Bei einer Zuordnung von Object über den Objekt-Baum wird die Reihenfolge zurückgesetzt!
 ! Räume am Ende anfügen geht über "Aufzählungen-Rooms-WearOS" per Drag&Drop
 ! Sobald die Räume geändert wurden, muss die App neu gestartet werden. Dazu reicht es den "Back"-Knopf an der Uhr zu drücken und die App neu zu öffnen.
@@ -106,7 +102,7 @@ adb uninstall "com.schnup.iobrokerw"
   
   
 ## Konfiguration APP
-Server URL definieren im Format: http://192.168.10.4:8084
+Server URL definieren im Format: `http://192.168.10.4:8084`
   
   
 ## Fehlermeldungen
@@ -134,14 +130,14 @@ Zu finden hier: Einstellungen - Erweiterte Funktionen - Anpassen von Tasten > Hi
 
 
 ## Known Bugs / Verbesserungen
-- <s>Sporadisch kurzer Verbindungsverlust, siehe Websocket vs PollingXHR</s> -  Fixed V2.6
+- <s>Sporadisch kurzer Verbindungsverlust, siehe Websocket vs PollingXHR</s> - **Fixed V2.6**
 - <s>Manchmal werden mehrere "Instanzen" erstellt </s>
-- <s>Wenn Server URL definiert ist und nicht erreichbar bleibt die App  Startbildschirm</s>  - Fixed V2.1
+- <s>Wenn Server URL definiert ist und nicht erreichbar bleibt die App  Startbildschirm</s> - **Fixed V2.1**
 - "Swipe" zu schließen aktivieren wenn kein Slider konfiguriert ist
 - <s>Rückgabewert anhand des definierten Typ Boolean/"ON","OFF"</s> <-ToggleChip ist jetzt immer boolean
-- <s>Connection Manager implementieren und bei WiFi immer dieses zuerst nutzen</s>  - Sollte kein Problem mehr sein, V2.6
+- <s>Connection Manager implementieren und bei WiFi immer dieses zuerst nutzen</s> - Sollte **kein Problem** mehr sein, V2.6
 
-In der aktellen Version sollte die App auch mit den bekannten Bugs zuverlässig laufen
+In der aktellen Version sollte die App auch mit den bekannten Bugs zuverlässig laufen.
 
 
 ## Jetpack Compose...
