@@ -28,7 +28,7 @@ Ich habe bei mir den Socket.IO Adapter deinstalliert und den Websocketsadapter i
 
 **Grundkonfiguration**
 - Raum "WearOS" unter Aufzählung->Räume erstellen
-- Die auf der Uhr dargestellten Objects/States müssen dem Raum `WearOS` zugeteilt werden -> Siehe Punkt "Objects-Anordnung"
+- Die auf der Uhr dargestellten Objects/States müssen dem Raum `WearOS` zugeteilt werden -> Siehe Punkt [Anordnung der Objekte](#anordnung-der-objekte)
 
 ![image](https://user-images.githubusercontent.com/28166743/150635785-b8b4d6be-9404-412b-8c38-814864c167bb.png)
 
