@@ -630,7 +630,11 @@ class MainActivity : ComponentActivity(), MessageListener {
         newChip.sIconB64 = jsEnums["common"]!!.jsonObject["icon"].toString().replace("\"","")
         newChip.bWriteable  = jsEnums["common"]!!.jsonObject["write"].toString().replace("\"","").toBoolean()
         newChip.sColorOn = fCheckColorCode(jsEnums["common"]!!.jsonObject["color"].toString().replace("\"",""))
-        newChip.sColorBgnd = fCheckColorCode(jsEnums["common"]!!.jsonObject["color-background"].toString().replace("\"",""))
+        newChip.sColorBgnd = fCheckColorCode(jsEnums["common"]!!.jsonObject["colorBackground"].toString().replace("\"",""))
+        if (newChip.sColorBgnd == null || newChip.sColorBgnd == "null" || newChip.sColorBgnd.isEmpty()) {
+            // compatibility with old versions
+            newChip.sColorBgnd = fCheckColorCode(jsEnums["common"]!!.jsonObject["color-background"].toString().replace("\"",""))
+        }
         newChip.nMinMax = fGetSliderRange(jsEnums["common"]!!.jsonObject["min"].toString().replace("\"",""), jsEnums["common"]!!.jsonObject["max"].toString().replace("\"",""))
         newChip.nSteps = jsEnums["common"]!!.jsonObject["step"].toString().replace("\"","").toIntOrNull()
         //Get Object-Role and set Type
