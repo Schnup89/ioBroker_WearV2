@@ -17,3 +17,6 @@ app/release/app-release.apk
 app/build.gradle
 app/release/output-metadata.json
 keystore.properties
+.idea/deploymentTargetDropDown.xml
+.idea/deploymentTargetDropDown.xml
+.idea/deploymentTargetDropDown.xml

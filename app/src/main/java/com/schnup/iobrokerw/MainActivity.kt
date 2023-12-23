@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
+import android.view.inputmethod.EditorInfo
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -41,6 +42,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.material.*
 import androidx.wear.input.RemoteInputIntentHelper
+//import androidx.wear.input.wearableExtender
 import com.schnup.iobrokerw.ui.theme.IoBrokerWTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,418 +89,412 @@ class MainActivity : ComponentActivity(), MessageListener {
         lChips[nIndex] = lChips[nIndex].copy(bUpdateCompose = bFlipedBool)
     }
 
-
-
     @ExperimentalComposeUiApi
     @SuppressLint("StateFlowValueCalledInComposition")
     @ExperimentalWearMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         setContent {
             val csIndicator by sIndicator.collectAsState()
             val csNotify by sNotify.collectAsState()
             val csUrl by sUrl.collectAsState()
-            val cbIsLoading by bIsLoading.collectAsState()
             val hHaptic = LocalHapticFeedback.current
 
-
-            if (cbIsLoading) {
-                //Leave Splashscreen until Data is Loaded
-            } else {
-                val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    it.data?.let { data ->
-                        val results: Bundle = RemoteInput.getResultsFromIntent(data)
-                        val sInpUrl: CharSequence? = results.getCharSequence("url")
-                        sUrl.value = sInpUrl.toString()
-                        this.getPreferences(Context.MODE_PRIVATE).edit().putString("sUrl",sInpUrl.toString()).apply()
-                        sNotify.value = ""  //Remove "Bitte Server angeben-Notify"
-                        //Connect if no Items feteched an Connection state is not connected
-                        if (lChips.lastIndex == -1) {
-                            //Connect to IOBroker and Callback Handler && Subscribe to IDs to get the States
-                            //if (fSetupSocket()) fSetupList()
-                            fSetupSocket()
-                        }
+            val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                it.data?.let { data ->
+                    val results: Bundle = RemoteInput.getResultsFromIntent(data)
+                    val sInpUrl: CharSequence? = results.getCharSequence("url")
+                    sUrl.value = sInpUrl.toString()
+                    this.getPreferences(Context.MODE_PRIVATE).edit().putString("sUrl",sInpUrl.toString()).apply()
+                    sNotify.value = ""  //Remove "Bitte Server angeben-Notify"
+                    //Connect if no Items feteched an Connection state is not connected
+                    if (lChips.lastIndex == -1) {
+                        //Connect to IOBroker and Callback Handler && Subscribe to IDs to get the States
+                        fSetupSocket()
                     }
                 }
+            }
 
-                IoBrokerWTheme {
-                    val scalingLazyListState: ScalingLazyListState = rememberScalingLazyListState()
-                    val coroutineScope = rememberCoroutineScope()
-                    val focusRequester = remember { FocusRequester() }
 
-                    LaunchedEffect(Unit) {
-                        focusRequester.requestFocus()
+
+            IoBrokerWTheme {
+                val scalingLazyListState: ScalingLazyListState = rememberScalingLazyListState()
+                val coroutineScope = rememberCoroutineScope()
+                val focusRequester = remember { FocusRequester() }
+
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
+
+                Scaffold(
+                    modifier = Modifier
+                        .background(Color.Black)
+                        .focusable(false),
+                    timeText = {
+                        TimeText(
+                            startCurvedContent = {
+                                curvedText(
+                                    text = csIndicator, //✔
+                                    fontWeight = FontWeight.Bold,
+                                    style =
+                                    when (csIndicator) {
+                                        "?" -> CurvedTextStyle(color = Color.Yellow)
+                                        "X" -> CurvedTextStyle(color = Color.Red)
+                                        else -> CurvedTextStyle(color = Color.Green)
+                                    }
+                                )
+                            }
+                        )
+                    },
+                    vignette = {
+                        Vignette(vignettePosition = VignettePosition.TopAndBottom)
+                    },
+                    positionIndicator = {
+                        PositionIndicator(
+                            scalingLazyListState = scalingLazyListState
+                        )
                     }
-
-                    Scaffold(
+                ) {
+                    ScalingLazyColumn(
                         modifier = Modifier
-                            .background(Color.Black)
-                            .focusable(false),
-                        timeText = {
-                            TimeText(
-                                startCurvedContent = {
-                                    curvedText(
-                                        text = csIndicator, //✔
-                                        fontWeight = FontWeight.Bold,
-                                        style =
-                                        when (csIndicator) {
-                                            "?" -> CurvedTextStyle(color = Color.Yellow)
-                                            "X" -> CurvedTextStyle(color = Color.Red)
-                                            else -> CurvedTextStyle(color = Color.Green)
-                                        }
+                            .fillMaxSize()
+                            .onPreRotaryScrollEvent {
+                                coroutineScope.launch {
+                                    //Scroll with Rotary
+                                    scalingLazyListState.animateScrollBy(it.verticalScrollPixels,
+                                        //Smooth Scrolling
+                                        animationSpec = tween(
+                                            durationMillis = 200,
+                                            easing = LinearOutSlowInEasing
+                                        )
                                     )
                                 }
-                            )
-                        },
-                        vignette = {
-                            Vignette(vignettePosition = VignettePosition.TopAndBottom)
-                        },
-                        positionIndicator = {
-                            PositionIndicator(
-                                scalingLazyListState = scalingLazyListState
-                            )
-                        }
+                                true
+                            }
+                            .focusRequester(focusRequester)
+                            .focusable(),
+                        contentPadding = PaddingValues(
+                            top = 40.dp,
+                            start = 10.dp,
+                            end = 10.dp,
+                            bottom = 0.dp
+                        ),
+                        verticalArrangement = Arrangement.Center,
+                        state = scalingLazyListState
                     ) {
-                        ScalingLazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .onPreRotaryScrollEvent {
-                                    coroutineScope.launch {
-                                        //Scroll with Rotary
-                                        scalingLazyListState.animateScrollBy(it.verticalScrollPixels,
-                                            //Smooth Scrolling
-                                            animationSpec = tween(
-                                                durationMillis = 200,
-                                                easing = LinearOutSlowInEasing
-                                            )
-                                        )
-                                    }
-                                    true
+                        if (csNotify.isNotEmpty()) {
+                            item {
+                                //Only Show Notify-Text if its not empty
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentSize(align = Alignment.Center)
+                                        .padding(top = 40.dp),
+                                    text = csNotify
+                                )
+                            }
+                        }
+                        items(lChips) { myChip ->
+                            when (myChip.nType ) {
+                                1 -> {   //############## Switch
+                                    var cBgnd: Color = Color.DarkGray
+                                    if (myChip.sColorBgnd != "null") cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
+                                    ToggleChip(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 4.dp),
+                                        colors =
+                                            ToggleChipDefaults.toggleChipColors(
+                                                checkedStartBackgroundColor = cBgnd
+                                            ),
+                                            appIcon = {
+                                                var cStateON: Color = Color.Unspecified
+                                                //Check if Icon present
+                                                if ((myChip.sIconB64.isNotEmpty()) and (myChip.sIconB64 != "null")) {
+                                                    //Check if ON-Color is provided and value is ON
+                                                    if (myChip.sVal.toBoolean() && myChip.sColorOn != "null") cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
+                                                    Icon(
+                                                        bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
+                                                        contentDescription = "Custom",
+                                                        tint = cStateON,
+                                                        modifier = Modifier
+                                                            .padding(top = 3.dp, bottom = 3.dp)
+                                                            .wrapContentSize(align = Alignment.Center),
+                                                    )
+                                                }
+                                            },
+                                            toggleControl = {
+                                                Switch(checked = myChip.sVal.toBoolean())
+                                            },
+                                            checked = true,
+                                            label = {
+                                                Text(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    color = Color.White,
+                                                    text = myChip.sName
+                                                )
+                                            },
+                                            enabled = myChip.bWriteable,
+                                            onCheckedChange = {
+                                                hHaptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                WebSocketManager.sendMessage(JSONArray(listOf(3,
+                                                    WebSocketManager.nWSID,"setState",JSONArray(listOf(myChip.sStateID,(!myChip.sVal.toBoolean()))))).toString())
+                                            },
+                                    )
                                 }
-                                .focusRequester(focusRequester)
-                                .focusable(),
-                            contentPadding = PaddingValues(
-                                top = 40.dp,
-                                start = 10.dp,
-                                end = 10.dp,
-                                bottom = 0.dp
-                            ),
-                            verticalArrangement = Arrangement.Center,
-                            state = scalingLazyListState
-                        ) {
-                            if (csNotify.isNotEmpty()) {
-                                item {
-                                    //Only Show Notify-Text if its not empty
+                                2 -> {   //############# Level / Slider
+                                    var cBgnd: Color = Color.DarkGray
+                                    var cOn: Color = Color.Yellow
+                                    var nSteps = 0
+                                    if (myChip.sColorBgnd != "null") cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
+                                    if (myChip.sColorOn != "null") cOn = Color(android.graphics.Color.parseColor(myChip.sColorOn))
+                                    if (myChip.nSteps != null) nSteps = ((myChip.nMinMax.endInclusive-myChip.nMinMax.start) / myChip.nSteps!!).toInt()
+                                    Chip(
+                                        colors = ChipDefaults.primaryChipColors(
+                                            backgroundColor = cBgnd
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 4.dp),
+                                        icon = {
+                                            var cStateON: Color = Color.Unspecified
+                                            //Check if Icon present
+                                            if ((myChip.sIconB64.isNotEmpty()) and (myChip.sIconB64 != "null")) {
+                                                //Check if ON-Color is provided and value is ON
+                                                if (myChip.sVal.toBoolean() && myChip.sColorOn != "null") cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
+                                                Icon(
+                                                    bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
+                                                    contentDescription = "Custom",
+                                                    tint = cStateON,
+                                                    modifier = Modifier
+                                                        .padding(top = 3.dp, bottom = 3.dp)
+                                                        .wrapContentSize(align = Alignment.Center),
+                                                )
+                                            }
+                                        },
+                                        label = {
+                                            Text(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .wrapContentSize(align = Alignment.TopStart),
+                                                color = Color.White,
+                                                maxLines = 1,
+                                                text = myChip.sName
+                                            )
+                                        },
+                                        secondaryLabel = {
+                                           if (myChip.sVal.isDigitsOnly()) {
+                                                Slider(
+                                                    modifier = Modifier
+                                                        .fillParentMaxWidth()
+                                                        .fillParentMaxHeight()
+                                                        .wrapContentSize(align = Alignment.BottomEnd),
+                                                    value = myChip.sVal.toFloat(),
+                                                    onValueChange = {
+                                                        lChips[myChip.nIndex] = myChip.copy(sVal = it.toInt().toString())
+                                                        lifecycleScope.launch {
+                                                            fSliderChanged(myChip.sStateID,it.toInt(), myChip.nIndex)
+                                                        }
+                                                    },
+                                                    enabled = myChip.bWriteable,
+                                                    valueRange = myChip.nMinMax,
+                                                    steps = nSteps,
+                                                    colors =
+                                                        SliderDefaults.colors(
+                                                            activeTickColor = cOn,
+                                                            inactiveTickColor = cOn,
+                                                            inactiveTrackColor = cOn,
+                                                            activeTrackColor = cOn,
+                                                            thumbColor = cOn
+                                                        )
+                                                )
+                                           }
+                                        },
+                                        onClick = {},
+                                        enabled = myChip.bWriteable,
+                                    )
+                                }
+                                3 -> {   //############## Switch PressButton
+                                    val interactionSource = remember { MutableInteractionSource() }
+                                    val isPressed by interactionSource.collectIsPressedAsState()
+                                    var cBgnd: Color = Color.DarkGray
+                                    if (myChip.sColorBgnd != "null") cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
+                                    if (isPressed) {
+                                        cBgnd = Color.Yellow
+                                        if (myChip.sVal == "false") {
+                                            WebSocketManager.sendMessage(JSONArray(listOf(3,
+                                                WebSocketManager.nWSID,"setState",JSONArray(listOf(myChip.sStateID,"true")))).toString())
+                                            myChip.sVal = "true"
+                                        }
+                                        //Use if + DisposableEffect to wait for the press action is completed
+                                        DisposableEffect(Unit) {
+                                            onDispose {
+                                                WebSocketManager.sendMessage(JSONArray(listOf(3,
+                                                    WebSocketManager.nWSID,"setState",JSONArray(listOf(myChip.sStateID,"false")))).toString())
+                                                myChip.sVal = "false"
+                                            }
+                                        }
+                                    }
+                                    Chip(
+                                        colors = ChipDefaults.primaryChipColors(
+                                            backgroundColor = cBgnd,
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 4.dp),
+                                        icon = {
+                                            var cStateON: Color = Color.Unspecified
+                                            //Check if Icon present
+                                            if ((myChip.sIconB64.isNotEmpty()) and (myChip.sIconB64 != "null")) {
+                                                //Check if ON-Color is provided and value is ON
+                                                if (myChip.sVal.toBoolean() && myChip.sColorOn != "null") cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
+                                                Icon(
+                                                    bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
+                                                    contentDescription = "Custom",
+                                                    tint = cStateON,
+                                                    modifier = Modifier
+                                                        .padding(top = 3.dp, bottom = 3.dp)
+                                                        .wrapContentSize(align = Alignment.Center),
+                                                )
+                                            }
+                                        },
+                                        label = {
+                                            Text(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .wrapContentSize(align = Alignment.TopStart),
+                                                color = Color.White,
+                                                maxLines = 1,
+                                                text = myChip.sName
+                                            )
+                                        },
+                                        onClick = {
+                                            //Nothing
+                                        },
+                                        interactionSource = interactionSource,
+                                        enabled = true
+                                    )
+                                }
+                                else -> {     //############# Label
+                                    var cBgnd: Color = Color.DarkGray
+                                    if (myChip.sColorBgnd != "null") {
+                                        cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
+                                    }
+                                    Chip(
+                                        colors = ChipDefaults.primaryChipColors(
+                                            backgroundColor = cBgnd
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 4.dp),
+                                        icon = {
+                                            if ((myChip.sIconB64.isNotEmpty()) and (myChip.sIconB64 != "null")) {
+                                                Icon(
+                                                    bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
+                                                    contentDescription = "Custom",
+                                                    modifier = Modifier
+                                                        .padding(top = 3.dp, bottom = 3.dp)
+                                                        .wrapContentSize(align = Alignment.Center),
+                                                )
+                                            }
+                                        },
+                                        label = {
+                                            Text(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .wrapContentSize(align = Alignment.TopStart),
+                                                color = Color.White,
+                                                maxLines = 1,
+                                                text = myChip.sName
+                                            )
+                                        },
+                                        secondaryLabel = {
+                                            Text (
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .wrapContentSize(align = Alignment.BottomEnd),
+                                                color = Color.Cyan,
+                                                maxLines = 1,
+                                                text = if ((myChip.sUnit.isEmpty()) or (myChip.sUnit == "null")) myChip.sVal else myChip.sVal + " " + myChip.sUnit
+                                            )
+                                        },
+                                        onClick = {
+                                            //Nothing
+                                        },
+                                        enabled = false
+                                    )
+                                }
+                            }
+                        }
+                        item {              //############# Chip Settings
+                            Chip(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 4.dp),
+                                label = {
                                     Text(
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentSize(align = Alignment.Center)
-                                            .padding(top = 40.dp),
-                                        text = csNotify
+                                            .wrapContentSize(align = Alignment.TopStart),
+                                        color = Color.White,
+                                        fontSize = 15.sp,
+                                        maxLines = 1,
+                                        text = "ioBroker-URL"
                                     )
-                                }
-                            }
-                            items(lChips) { myChip ->
-                                when (myChip.nType ) {
-                                    1 -> {   //############## Switch
-                                        var cBgnd: Color = Color.DarkGray
-                                        if (myChip.sColorBgnd != "null") cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
-                                        ToggleChip(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(top = 4.dp),
-                                            colors =
-                                                ToggleChipDefaults.toggleChipColors(
-                                                    checkedStartBackgroundColor = cBgnd
-                                                ),
-                                                appIcon = {
-                                                    var cStateON: Color = Color.Unspecified
-                                                    //Check if Icon present
-                                                    if ((myChip.sIconB64.isNotEmpty()) and (myChip.sIconB64 != "null")) {
-                                                        //Check if ON-Color is provided and value is ON
-                                                        if (myChip.sVal.toBoolean() && myChip.sColorOn != "null") cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
-                                                        Icon(
-                                                            bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
-                                                            contentDescription = "Custom",
-                                                            tint = cStateON,
-                                                            modifier = Modifier
-                                                                .padding(top = 3.dp, bottom = 3.dp)
-                                                                .wrapContentSize(align = Alignment.Center),
-                                                        )
-                                                    }
-                                                },
-                                                toggleControl = {
-                                                    Switch(checked = myChip.sVal.toBoolean())
-                                                },
-                                                checked = true,
-                                                label = {
-                                                    Text(
-                                                        modifier = Modifier.fillMaxWidth(),
-                                                        color = Color.White,
-                                                        text = myChip.sName
-                                                    )
-                                                },
-                                                enabled = myChip.bWriteable,
-                                                onCheckedChange = {
-                                                    hHaptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                    WebSocketManager.sendMessage(JSONArray(listOf(3,
-                                                        WebSocketManager.nWSID,"setState",JSONArray(listOf(myChip.sStateID,(!myChip.sVal.toBoolean()))))).toString())
-                                                },
-                                        )
-                                    }
-                                    2 -> {   //############# Level / Slider
-                                        var cBgnd: Color = Color.DarkGray
-                                        var cOn: Color = Color.Yellow
-                                        var nSteps = 0
-                                        if (myChip.sColorBgnd != "null") cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
-                                        if (myChip.sColorOn != "null") cOn = Color(android.graphics.Color.parseColor(myChip.sColorOn))
-                                        if (myChip.nSteps != null) nSteps = ((myChip.nMinMax.endInclusive-myChip.nMinMax.start) / myChip.nSteps!!).toInt()
-                                        Chip(
-                                            colors = ChipDefaults.primaryChipColors(
-                                                backgroundColor = cBgnd
-                                            ),
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(top = 4.dp),
-                                            icon = {
-                                                var cStateON: Color = Color.Unspecified
-                                                //Check if Icon present
-                                                if ((myChip.sIconB64.isNotEmpty()) and (myChip.sIconB64 != "null")) {
-                                                    //Check if ON-Color is provided and value is ON
-                                                    if (myChip.sVal.toBoolean() && myChip.sColorOn != "null") cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
-                                                    Icon(
-                                                        bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
-                                                        contentDescription = "Custom",
-                                                        tint = cStateON,
-                                                        modifier = Modifier
-                                                            .padding(top = 3.dp, bottom = 3.dp)
-                                                            .wrapContentSize(align = Alignment.Center),
-                                                    )
-                                                }
-                                            },
-                                            label = {
-                                                Text(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .wrapContentSize(align = Alignment.TopStart),
-                                                    color = Color.White,
-                                                    maxLines = 1,
-                                                    text = myChip.sName
-                                                )
-                                            },
-                                            secondaryLabel = {
-                                               if (myChip.sVal.isDigitsOnly()) {
-                                                    Slider(
-                                                        modifier = Modifier
-                                                            .fillParentMaxWidth()
-                                                            .fillParentMaxHeight()
-                                                            .wrapContentSize(align = Alignment.BottomEnd),
-                                                        value = myChip.sVal.toFloat(),
-                                                        onValueChange = {
-                                                            lChips[myChip.nIndex] = myChip.copy(sVal = it.toInt().toString())
-                                                            lifecycleScope.launch {
-                                                                fSliderChanged(myChip.sStateID,it.toInt(), myChip.nIndex)
-                                                            }
-                                                        },
-                                                        enabled = myChip.bWriteable,
-                                                        valueRange = myChip.nMinMax,
-                                                        steps = nSteps,
-                                                        colors =
-                                                            SliderDefaults.colors(
-                                                                activeTickColor = cOn,
-                                                                inactiveTickColor = cOn,
-                                                                inactiveTrackColor = cOn,
-                                                                activeTrackColor = cOn,
-                                                                thumbColor = cOn
-                                                            )
-                                                    )
-                                               }
-                                            },
-                                            onClick = {},
-                                            enabled = myChip.bWriteable,
-                                        )
-                                    }
-                                    3 -> {   //############## Switch PressButton
-                                        val interactionSource = remember { MutableInteractionSource() }
-                                        val isPressed by interactionSource.collectIsPressedAsState()
-                                        var cBgnd: Color = Color.DarkGray
-                                        if (myChip.sColorBgnd != "null") cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
-                                        if (isPressed) {
-                                            cBgnd = Color.Yellow
-                                            if (myChip.sVal == "false") {
-                                                WebSocketManager.sendMessage(JSONArray(listOf(3,
-                                                    WebSocketManager.nWSID,"setState",JSONArray(listOf(myChip.sStateID,"true")))).toString())
-                                                myChip.sVal = "true"
-                                            }
-                                            //Use if + DisposableEffect to wait for the press action is completed
-                                            DisposableEffect(Unit) {
-                                                onDispose {
-                                                    WebSocketManager.sendMessage(JSONArray(listOf(3,
-                                                        WebSocketManager.nWSID,"setState",JSONArray(listOf(myChip.sStateID,"false")))).toString())
-                                                    myChip.sVal = "false"
-                                                }
-                                            }
-                                        }
-                                        Chip(
-                                            colors = ChipDefaults.primaryChipColors(
-                                                backgroundColor = cBgnd,
-                                            ),
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(top = 4.dp),
-                                            icon = {
-                                                var cStateON: Color = Color.Unspecified
-                                                //Check if Icon present
-                                                if ((myChip.sIconB64.isNotEmpty()) and (myChip.sIconB64 != "null")) {
-                                                    //Check if ON-Color is provided and value is ON
-                                                    if (myChip.sVal.toBoolean() && myChip.sColorOn != "null") cStateON = Color(android.graphics.Color.parseColor(myChip.sColorOn))
-                                                    Icon(
-                                                        bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
-                                                        contentDescription = "Custom",
-                                                        tint = cStateON,
-                                                        modifier = Modifier
-                                                            .padding(top = 3.dp, bottom = 3.dp)
-                                                            .wrapContentSize(align = Alignment.Center),
-                                                    )
-                                                }
-                                            },
-                                            label = {
-                                                Text(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .wrapContentSize(align = Alignment.TopStart),
-                                                    color = Color.White,
-                                                    maxLines = 1,
-                                                    text = myChip.sName
-                                                )
-                                            },
-                                            onClick = {
-                                                //Nothing
-                                            },
-                                            interactionSource = interactionSource,
-                                            enabled = true
-                                        )
-                                    }
-                                    else -> {     //############# Label
-                                        var cBgnd: Color = Color.DarkGray
-                                        if (myChip.sColorBgnd != "null") {
-                                            cBgnd = Color(android.graphics.Color.parseColor(myChip.sColorBgnd))
-                                        }
-                                        Chip(
-                                            colors = ChipDefaults.primaryChipColors(
-                                                backgroundColor = cBgnd
-                                            ),
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(top = 4.dp),
-                                            icon = {
-                                                if ((myChip.sIconB64.isNotEmpty()) and (myChip.sIconB64 != "null")) {
-                                                    Icon(
-                                                        bitmap = myChip.sIconB64.decodeBase64IntoBitmap(),
-                                                        contentDescription = "Custom",
-                                                        modifier = Modifier
-                                                            .padding(top = 3.dp, bottom = 3.dp)
-                                                            .wrapContentSize(align = Alignment.Center),
-                                                    )
-                                                }
-                                            },
-                                            label = {
-                                                Text(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .wrapContentSize(align = Alignment.TopStart),
-                                                    color = Color.White,
-                                                    maxLines = 1,
-                                                    text = myChip.sName
-                                                )
-                                            },
-                                            secondaryLabel = {
-                                                Text (
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .wrapContentSize(align = Alignment.BottomEnd),
-                                                    color = Color.Cyan,
-                                                    maxLines = 1,
-                                                    text = if ((myChip.sUnit.isEmpty()) or (myChip.sUnit == "null")) myChip.sVal else myChip.sVal + " " + myChip.sUnit
-                                                )
-                                            },
-                                            onClick = {
-                                                //Nothing
-                                            },
-                                            enabled = false
-                                        )
-                                    }
-                                }
-                            }
-                            item {              //############# Chip Settings
-                                Chip(
+                                    Text(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(top = 4.dp),
-                                    label = {
-                                        Text(
-                                            modifier = Modifier
-                                                .wrapContentSize(align = Alignment.TopStart),
-                                            color = Color.White,
-                                            fontSize = 15.sp,
-                                            maxLines = 1,
-                                            text = "ioBroker-URL"
-                                        )
-                                        Text(
+                                        .wrapContentSize(align = Alignment.TopEnd),
+                                    color = Color.White,
+                                    fontSize = 12.sp,
+                                    maxLines = 1,
+                                    text = "v" + BuildConfig.VERSION_NAME
+                                    )
+                                },
+                                secondaryLabel = {
+                                    Text (
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .wrapContentSize(align = Alignment.TopEnd),
-                                        color = Color.White,
-                                        fontSize = 12.sp,
+                                            .wrapContentSize(align = Alignment.BottomEnd),
+                                        color = Color.Cyan,
                                         maxLines = 1,
-                                        text = "v" + BuildConfig.VERSION_NAME
-                                        )
-                                    },
-                                    secondaryLabel = {
-                                        Text (
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .wrapContentSize(align = Alignment.BottomEnd),
-                                            color = Color.Cyan,
-                                            maxLines = 1,
-                                            text = csUrl
-                                        )
-                                    },
-                                    onClick = {
-                                        val iRemInp: Intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
-                                        val lRemInp: List<RemoteInput> = listOf(
-                                            RemoteInput.Builder("url")
-                                                .setLabel("ioBroker URL http://xxx:8084")
-                                                .build())
-                                        RemoteInputIntentHelper.putRemoteInputsExtra(iRemInp, lRemInp)
-                                        launcher.launch(iRemInp)
-                                    },
-                                    enabled = true,
-                                    colors = ChipDefaults.imageBackgroundChipColors(
-                                        backgroundImagePainter = painterResource(id = R.drawable.wrench)
+                                        text = csUrl
                                     )
+                                },
+                                onClick = {
+                                    val iRemInp: Intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
+                                    val lRemInp: List<RemoteInput> = listOf(
+                                        RemoteInput.Builder("url")
+                                            .setLabel("ioBroker URL http://xxx:8084")
+                                            /*.wearableExtender { setEmojisAllowed(false) }
+                                            .setChoices(arrayOf("jo"))*/
+                                            .build())
+                                    RemoteInputIntentHelper.putRemoteInputsExtra(iRemInp, lRemInp)
+                                    launcher.launch(iRemInp)
+                                },
+                                enabled = true,
+                                colors = ChipDefaults.imageBackgroundChipColors(
+                                    backgroundImagePainter = painterResource(id = R.drawable.wrench)
                                 )
-                            }
-                            item {              //############# Chip Exit
-                                Chip(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 4.dp),
-                                    label = {
-                                    },
-                                    secondaryLabel = {
-                                    },
-                                    onClick = {
-                                        exitProcess(0)
-                                    },
-                                    enabled = true,
-                                    colors = ChipDefaults.imageBackgroundChipColors(
-                                        backgroundImagePainter = painterResource(id = R.drawable.exitt)
-                                    )
+                            )
+                        }
+                        item {              //############# Chip Exit
+                            Chip(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 4.dp),
+                                label = {
+                                },
+                                secondaryLabel = {
+                                },
+                                onClick = {
+                                    exitProcess(0)
+                                },
+                                enabled = true,
+                                colors = ChipDefaults.imageBackgroundChipColors(
+                                    backgroundImagePainter = painterResource(id = R.drawable.exitt)
                                 )
-                            }
+                            )
                         }
                     }
                 }
@@ -539,7 +535,7 @@ class MainActivity : ComponentActivity(), MessageListener {
         Log.d(WebSocketManager.TAG, "Connection Failed")
         nConFailedCnt++
         if (nConFailedCnt > 3 && bIsLoading.value) {
-            sNotify.value = "ioBroker not reachable! Restart App!"
+            sNotify.value = "ioBroker not reachable! Restart App to try again!"
             bIsLoading.value = false
         }
     }

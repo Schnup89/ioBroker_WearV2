@@ -26,7 +26,7 @@
         <item name="android:windowSwipeToDismiss">false</item>
         <item name="windowSplashScreenBackground">@color/ioBackgound</item>
 
-        <item name="windowSplashScreenAnimatedIcon">@drawable/iobroker_logo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/svg_iobroker_logo</item>
 
         <item name="postSplashScreenTheme">@style/Theme.IoBrokerW</item>
     </style>
