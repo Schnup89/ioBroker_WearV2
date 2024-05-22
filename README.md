@@ -76,9 +76,14 @@ Objekt-Baum mit Expertenansicht öffnen und mit dem Schraubenschlüssel bei `enu
 
 
 ## RED X
-Sollte ein Fehler auftren wird fast immer ein rotes X irgendwo auftreten.  
-- Sollte ein roten X anstatt ein ICON dargestellt werden, kann das ICON nicht ausgelesen werden -> Bitte Issue eröffnen mit Objekt-JSON aus ioBroker
+Sollte ein Fehler auftreten wird fast immer ein rotes X irgendwo angezeigt.
+- Sollte ein rotes X anstatt eines ICON dargestellt werden, kann das ICON nicht ausgelesen werden -> Bitte Issue eröffnen mit Objekt-JSON aus ioBroker
 - Im Status-Indicator: Grüner Haken -> SocketIO ist verbunden mit ioBroker; Rotes X -> SocketIO hat die Verbindung zu ioBroker verloren
+
+## Gelbes ?
+Das gelbe Fragezeichen wird immer dann angezeigt wenn die Uhr keine Verbindung mit dem Server aufbauen kann  
+- Bei dem ersten Starten der App, wenn keine URL vergeben ist  
+- Oder die URL in den Einstellungen der APP entspricht nicht einem URL-Format entspricht. Bitte die Eingabe nochmals prüfen.  
 
 
 ## APK installieren
