@@ -1,6 +1,9 @@
 package com.schnup.iobrokerw
 
+//import androidx.wear.input.wearableExtender
+
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.RemoteInput
 import android.content.Context
 import android.content.Intent
@@ -8,7 +11,9 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
-import android.view.inputmethod.EditorInfo
+import android.widget.AdapterView.OnItemLongClickListener
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -42,7 +47,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.material.*
 import androidx.wear.input.RemoteInputIntentHelper
-//import androidx.wear.input.wearableExtender
 import com.schnup.iobrokerw.ui.theme.IoBrokerWTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,6 +80,9 @@ class MainActivity : ComponentActivity(), MessageListener {
     private val sIndicator = MutableStateFlow("?")
     private val sNotify = MutableStateFlow("")
     private val sUrl = MutableStateFlow("")
+    private val sUsername = MutableStateFlow("")
+    private val sPassword = MutableStateFlow("")
+    private val sIgnWCert = MutableStateFlow("")
     private val lChips = mutableStateListOf<dcIOChips>()
     private var bIsLoading = MutableStateFlow(true)
     private var bSliderCoolDown = false
@@ -99,20 +106,27 @@ class MainActivity : ComponentActivity(), MessageListener {
             val csIndicator by sIndicator.collectAsState()
             val csNotify by sNotify.collectAsState()
             val csUrl by sUrl.collectAsState()
+            val csIgnWCert by sIgnWCert.collectAsState()
             val hHaptic = LocalHapticFeedback.current
 
-            val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {//Remote Input Rückgabewerte
                 it.data?.let { data ->
                     val results: Bundle = RemoteInput.getResultsFromIntent(data)
-                    val sInpUrl: CharSequence? = results.getCharSequence("url")
-                    sUrl.value = sInpUrl.toString()
-                    this.getPreferences(Context.MODE_PRIVATE).edit().putString("sUrl",sInpUrl.toString()).apply()
-                    sNotify.value = ""  //Remove "Bitte Server angeben-Notify"
-                    //Connect if no Items feteched an Connection state is not connected
-                    if (lChips.lastIndex == -1) {
-                        //Connect to IOBroker and Callback Handler && Subscribe to IDs to get the States
-                        fSetupSocket()
+                    if (!results.getCharSequence("url").isNullOrEmpty()) {
+                        sUrl.value = results.getCharSequence("url").toString()
+                        this.getPreferences(Context.MODE_PRIVATE).edit().putString("sUrl",results.getCharSequence("url").toString()).apply()
+                        sNotify.value = ""  //Remove "Bitte Server angeben-Notify"
                     }
+                    if (!results.getCharSequence("username").isNullOrEmpty()) {
+                        sUsername.value = results.getCharSequence("username").toString()
+                        this.getPreferences(Context.MODE_PRIVATE).edit().putString("sUsername",results.getCharSequence("username").toString()).apply()
+                    }
+                    if (!results.getCharSequence("password").isNullOrEmpty()) {
+                        sPassword.value = results.getCharSequence("password").toString()
+                        this.getPreferences(Context.MODE_PRIVATE).edit().putString("sPassword",results.getCharSequence("password").toString()).apply()
+                    }
+                    //New Connection
+                    fSetupSocket()
                 }
             }
 
@@ -162,7 +176,8 @@ class MainActivity : ComponentActivity(), MessageListener {
                             .onPreRotaryScrollEvent {
                                 coroutineScope.launch {
                                     //Scroll with Rotary
-                                    scalingLazyListState.animateScrollBy(it.verticalScrollPixels,
+                                    scalingLazyListState.animateScrollBy(
+                                        it.verticalScrollPixels,
                                         //Smooth Scrolling
                                         animationSpec = tween(
                                             durationMillis = 200,
@@ -442,13 +457,13 @@ class MainActivity : ComponentActivity(), MessageListener {
                                         text = "ioBroker-URL"
                                     )
                                     Text(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .wrapContentSize(align = Alignment.TopEnd),
-                                    color = Color.White,
-                                    fontSize = 12.sp,
-                                    maxLines = 1,
-                                    text = "v" + BuildConfig.VERSION_NAME
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .wrapContentSize(align = Alignment.TopEnd),
+                                        color = Color.White,
+                                        fontSize = 12.sp,
+                                        maxLines = 1,
+                                        text = "v" + BuildConfig.VERSION_NAME
                                     )
                                 },
                                 secondaryLabel = {
@@ -457,20 +472,100 @@ class MainActivity : ComponentActivity(), MessageListener {
                                             .fillMaxWidth()
                                             .wrapContentSize(align = Alignment.BottomEnd),
                                         color = Color.Cyan,
+                                        fontSize = 8.sp,
                                         maxLines = 1,
                                         text = csUrl
                                     )
                                 },
                                 onClick = {
                                     val iRemInp: Intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
-                                    val lRemInp: List<RemoteInput> = listOf(
-                                        RemoteInput.Builder("url")
-                                            .setLabel("ioBroker URL http://xxx:8084")
-                                            /*.wearableExtender { setEmojisAllowed(false) }
-                                            .setChoices(arrayOf("jo"))*/
-                                            .build())
-                                    RemoteInputIntentHelper.putRemoteInputsExtra(iRemInp, lRemInp)
-                                    launcher.launch(iRemInp)
+                                    var lRemInp: List<RemoteInput>
+
+                                    val alertBuilder = AlertDialog.Builder(
+                                        this@MainActivity
+                                    )
+                                    alertBuilder.setTitle("Settings (Longpress to delete)")
+                                    val arrayAdapter = ArrayAdapter<String>(
+                                        this@MainActivity,
+                                        android.R.layout.simple_selectable_list_item
+                                    )
+                                    arrayAdapter.add("URL (http://xxx:8084)")
+                                    arrayAdapter.add("Username (Optional)")
+                                    arrayAdapter.add("Password (Optional)")
+                                    arrayAdapter.add("Ign. Insec. Cert.: " + csIgnWCert)
+
+                                    alertBuilder.setNegativeButton(
+                                        "Cancel"
+                                    ) { dialog, which ->
+                                        fSetupSocket()
+                                        dialog.dismiss()
+                                    }
+
+                                    alertBuilder.setAdapter(
+                                        arrayAdapter
+                                    ) { dialog, pos ->
+                                        when (pos) {
+                                            0 -> {
+                                                lRemInp = listOf(
+                                                    RemoteInput.Builder("url")
+                                                        .setLabel("ioBroker URL http://xxx:8084")
+                                                        .build())
+                                                RemoteInputIntentHelper.putRemoteInputsExtra(iRemInp, lRemInp)
+                                                launcher.launch(iRemInp)
+                                            }
+                                            1 -> {
+                                                lRemInp = listOf(
+                                                    RemoteInput.Builder("username")
+                                                        .setLabel("ioBroker Username")
+                                                        .setAllowFreeFormInput(true)
+                                                        .build())
+                                                RemoteInputIntentHelper.putRemoteInputsExtra(iRemInp, lRemInp)
+                                                launcher.launch(iRemInp)
+                                            }
+                                            2 -> {
+                                                lRemInp = listOf(
+                                                    RemoteInput.Builder("password")
+                                                        .setLabel("ioBroker Password")
+                                                        .build())
+                                                RemoteInputIntentHelper.putRemoteInputsExtra(iRemInp, lRemInp)
+                                                launcher.launch(iRemInp)
+                                            }
+                                            3 -> {
+                                                if (sIgnWCert.value == "Yes") sIgnWCert.value = "No" else if (sIgnWCert.value == "No") sIgnWCert.value = "Yes" else sIgnWCert.value = "No"
+                                                getPreferences(Context.MODE_PRIVATE).edit().putString("sIgnWCert",sIgnWCert.value).apply()
+                                                fSetupSocket()
+                                            }
+                                        }
+                                        //if (pos != 3) dialog.dismiss()
+                                    }
+
+                                    val alertDialog = alertBuilder.create()
+                                    alertDialog.setOnShowListener {
+                                        val listView = alertDialog.listView
+                                        listView.onItemLongClickListener =
+                                            OnItemLongClickListener { parent, view, pos, id ->
+                                                when (pos) {
+                                                    0 -> {
+                                                        sUrl.value = ""
+                                                        getPreferences(Context.MODE_PRIVATE).edit().putString("sUrl","").apply()
+                                                        Toast.makeText(this@MainActivity, "URL deleted", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                    1 -> {
+                                                        sUsername.value = ""
+                                                        getPreferences(Context.MODE_PRIVATE).edit().putString("sUsername","").apply()
+                                                        Toast.makeText(this@MainActivity, "Username deleted", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                    2 -> {
+                                                        sPassword.value = ""
+                                                        getPreferences(Context.MODE_PRIVATE).edit().putString("sPassword","").apply()
+                                                        Toast.makeText(this@MainActivity, "Password deleted", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                }
+                                                //alertDialog.dismiss()
+                                                true
+                                            }
+                                    }
+                                    alertDialog.show()
                                 },
                                 enabled = true,
                                 colors = ChipDefaults.imageBackgroundChipColors(
@@ -501,8 +596,14 @@ class MainActivity : ComponentActivity(), MessageListener {
             }
         }
 
-        //Check if configuration is present
+        //Set stored Settings
         sUrl.value = this.getPreferences(Context.MODE_PRIVATE).getString("sUrl","").toString()
+        sUsername.value = this.getPreferences(Context.MODE_PRIVATE).getString("sUsername","").toString()
+        sPassword.value = this.getPreferences(Context.MODE_PRIVATE).getString("sPassword","").toString()
+        sIgnWCert.value = this.getPreferences(Context.MODE_PRIVATE).getString("sIgnWCert","").toString()
+
+
+        //Check if configuration is present
         if (sUrl.value.isEmpty()) {
             sNotify.value = "Bitte Server und Port angeben! \r\n Swipe nach rechts zum beenden ist deaktiviert!"
             bIsLoading.value = false
@@ -513,19 +614,22 @@ class MainActivity : ComponentActivity(), MessageListener {
     }
 
     private fun fSetupSocket(): Boolean {
+        //Remove "admin sid" from url (if present) (Workaround old Version)
+        if (sUrl.value.endsWith("/?sid=admin")) sUrl.value = sUrl.value.dropLast(11)
+        //Get URL Parameter (Authentication)
+        if (sUsername.value != "") sUrl.value = sUrl.value + "/?sid=" + sUsername.value + "&user=" + sUsername.value else sUrl.value = sUrl.value + "/?sid=admin"
+        if (sPassword.value != "") sUrl.value = sUrl.value + "&pass=" + sPassword.value
         //Connect to ioBroker
-        if (sUrl.value.endsWith("/?sid=admin")) sUrl.value = sUrl.value.dropLast(11)    //Remove sid from url and save it (Workaround old Version)
         WebSocketManager.close()
-        if (!WebSocketManager.init(sUrl.value + "/?sid=admin", this)) return false
+        if (!WebSocketManager.init(sUrl.value, this, sIgnWCert.value)) return false
         if (!WebSocketManager.connect()) return false
-
         Log.d(WebSocketManager.TAG, "Main: Connect OK")
         return true
     }
 
     override fun onConnectSuccess() {
-        val arg = JSONArray(listOf("WearOS"))
-        WebSocketManager.sendMessage(JSONArray(listOf(3,WebSocketManager.nWSID,"name",arg)).toString())
+        WebSocketManager.sendMessage(JSONArray(listOf(3,
+            WebSocketManager.nWSID,"name",JSONArray(listOf("WearOS")))).toString())
         sIndicator.value = "✓"
         nConFailedCnt = 0
     }
@@ -557,6 +661,14 @@ class MainActivity : ComponentActivity(), MessageListener {
         when (jMsg[0]) {    //Check Message-Type
             1 -> WebSocketManager.sendMessage(JSONArray(listOf(2)).toString())          //On Ping send Pong
             0,3 -> {                                                                    //On Message
+                Log.d(WebSocketManager.TAG, "onMsg: " + sMsg)                      //Debug print all Callback Messages
+                if (sMsg!!.contains("[\"permissionError\"]")) {                     //Check for Permission-Error
+                    sIndicator.value = "X"
+                    Log.d(WebSocketManager.TAG, "IObroker permission issue - check ioBroker Log")
+                    sNotify.value = "ioBroker User Permission issue!"
+                    bIsLoading.value = false
+                    return
+                }
                 when (jMsg[2]) {                                                        //Check Message Topic
                     "___ready___" -> {                                                  //On First "Ready" get WearOS Enums    //Fetch WearOS enum to get all Object/StateID's
                         nGetEnumsReqID = WebSocketManager.nWSID+1
@@ -579,6 +691,26 @@ class MainActivity : ComponentActivity(), MessageListener {
                     }
                     "stateChange" -> {
                         fStateChange(JSONArray(jMsg[3].toString()))
+                    }
+                    //3,0,"authenticate",[true,true]]
+                    "authenticate" -> {
+                        if (jMsg[3].toString() == "[null,null]") {
+                            sIndicator.value = "X"
+                            Log.d(
+                                WebSocketManager.TAG,
+                                "Not authenticated: authenticate[null,null] - check ioBroker Log"
+                            )
+                            sNotify.value = "Authentication Failure!"
+                            bIsLoading.value = false
+                        }
+                    }
+                    "reauthenticate" -> {
+                        sIndicator.value = "X"
+                        Log.d(WebSocketManager.TAG, "Not authenticated: Server wants reauth - check ioBroker Log")
+                        sNotify.value = "Authentication Failure!"
+                        bIsLoading.value = false
+                        //WebSocketManager.sendMessage(JSONArray(listOf(3,
+                        //    WebSocketManager.nWSID,"authenticate",JSONArray(listOf("wsuser","Tobi123456")))).toString())
                     }
                 }
             }

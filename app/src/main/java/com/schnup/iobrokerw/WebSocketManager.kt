@@ -4,7 +4,12 @@ import android.util.Log
 import okhttp3.*
 import okio.ByteString
 import org.json.JSONArray
+import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 object WebSocketManager {
     const val TAG = "Webscks"
@@ -15,16 +20,38 @@ object WebSocketManager {
     private lateinit var mWebSocket: WebSocket
     private var isConnect = false
     var nWSID = 0
+    //Accept all Certificates
+    val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+        override fun checkClientTrusted(p0: Array<out X509Certificate>?, authType: String?) {}
+        override fun checkServerTrusted(
+            chain: Array<out X509Certificate>?,
+            authType: String?
+        ) {}
+        override fun getAcceptedIssuers() = arrayOf<X509Certificate>()
+    })
 
 
-    fun init(url: String, _messageListener: MessageListener) : Boolean {
+    fun init(url: String, _messageListener: MessageListener, allcerts: String) : Boolean {
         try {
-            client = OkHttpClient.Builder()
-                .writeTimeout(2, TimeUnit.SECONDS)
-                .readTimeout(2, TimeUnit.SECONDS)
-                .connectTimeout(5, TimeUnit.SECONDS)
-                .retryOnConnectionFailure(true)
-                .build()
+            if (allcerts == "Yes") {
+                val sslContext = SSLContext.getInstance("SSL")
+                sslContext.init(null, trustAllCerts, java.security.SecureRandom())
+                val sslSocketFactory = sslContext.socketFactory
+                client = OkHttpClient.Builder()
+                    .writeTimeout(2, TimeUnit.SECONDS)
+                    .readTimeout(2, TimeUnit.SECONDS)
+                    .connectTimeout(5, TimeUnit.SECONDS)
+                    .retryOnConnectionFailure(true)
+                    .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
+                    .build()
+            } else {
+                client = OkHttpClient.Builder()
+                    .writeTimeout(2, TimeUnit.SECONDS)
+                    .readTimeout(2, TimeUnit.SECONDS)
+                    .connectTimeout(5, TimeUnit.SECONDS)
+                    .retryOnConnectionFailure(true)
+                    .build()
+            }
             request = Request.Builder().url(url).build()
             messageListener = _messageListener
         }catch (e:Exception){
