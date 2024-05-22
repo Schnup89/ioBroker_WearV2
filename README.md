@@ -107,8 +107,12 @@ adb uninstall "com.schnup.iobrokerw"
   
   
 ## Konfiguration APP
-Server URL definieren im Format: `http://192.168.10.4:8084`
-  
+Ab Version 2.9.2 gibt es ein Einstellungsmenü, die Server URL muss gesetzt werden mit HTTP oder HTTPS, wie gewünscht.  
+Server URL definieren im Format: `http://192.168.10.4:8084`  
+Ansonsten kann noch der Username und das Passwort für eine Authentifizierung mitgegeben werden.  
+Sollte der Websocket-Adapter kein valides Zertifikat präsentieren, kann dies mit der Option "Ignore Insecure Certificate" ignoriert werden.  
+Bei einem langen Klick auf Url, Username oder Passwort wird der aktuelle Wert gelöscht.  
+
   
 ## Fehlermeldungen
 Fehlermeldungen werden in der Objekt-Liste ganz oben angezeigt, hier die möglichen Fehlermeldungen und Lösungen:
@@ -155,6 +159,11 @@ Bzgl. der Performance hoffe ich hier auf einige Updates in der Zukunft.
 
 
 ## Changelog
+### 2.9.2 (2024-05-23)
+* (schnup89) Neu: Authentifizierung Username/Passwort kann aktiviert werden
+* (schnup89) Neu: Ignorieren von Unsicheren Webserverzertifikaten kann aktiviert werden
+* (schnup89) Neu: Einstellungsmenü erweitert
+
 
 ### 2.9 (2023-02-06)
 * (schnup89) Bugfix: Issue #13 Abfangen von Fehlerszenarien (Kein Connect, Enum nicht korrekt)
